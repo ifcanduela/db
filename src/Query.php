@@ -20,7 +20,7 @@ abstract class Query
     protected $sql;
 
     /** @var array */
-    protected $params;
+    protected $placeholders = [];
 
     /**
      * Create a SELECT query.
