@@ -1,0 +1,20 @@
+{
+    "name": "ifcanduela/db",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Igor F. Canduela",
+            "email": "ifcanduela@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "ifcanduela\\db\\": "src/"
+        },
+        "files": [
+                "./src/functions.php"
+        ]
+    }
+}
