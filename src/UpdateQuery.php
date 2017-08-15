@@ -6,7 +6,9 @@ use ifcanduela\db\traits\ConditionBuilder;
 
 class UpdateQuery extends Query
 {
+    /** @var string */
     protected $table;
+    /** @var array */
     protected $set;
 
     use ConditionBuilder;
@@ -18,6 +20,12 @@ class UpdateQuery extends Query
         }
     }
 
+    /**
+     * Columns and values to set.
+     *
+     * @param array $values
+     * @return self
+     */
     public function set(array $values)
     {
         $this->changed = true;
@@ -26,6 +34,9 @@ class UpdateQuery extends Query
         return $this;
     }
 
+    /**
+     * Build the query,
+     */
     protected function build()
     {
         if (!$this->table) {

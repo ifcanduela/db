@@ -22,5 +22,4 @@ class DeleteQueryTest extends PHPUnit\Framework\TestCase
         $q = Query::delete()->where(['a' => 1]);
         $q->getSql();
     }
-
 }

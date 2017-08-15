@@ -6,10 +6,16 @@ use ifcanduela\db\traits\ConditionBuilder;
 
 class InsertQuery extends Query
 {
+    /** @var array[] */
     protected $values;
 
     use ConditionBuilder;
 
+    /**
+     * InsertQuery constructor.
+     *
+     * @param string|NULL $table
+     */
     public function __construct(string $table = null)
     {
         if ($table) {
@@ -17,6 +23,12 @@ class InsertQuery extends Query
         }
     }
 
+    /**
+     * Specify the table to insert into.
+     *
+     * @param string $table
+     * @return self
+     */
     public function into(string $table)
     {
         $this->table($table);
@@ -24,6 +36,10 @@ class InsertQuery extends Query
         return $this;
     }
 
+    /**
+     * @param array[] $values,... Rows to insert
+     * @return self
+     */
     public function values(array ...$values)
     {
         $this->values = $values;
@@ -31,6 +47,9 @@ class InsertQuery extends Query
         return $this;
     }
 
+    /**
+     * Build the query,
+     */
     public function build()
     {
         if (!$this->table) {

@@ -3,7 +3,6 @@
 namespace ifcanduela\db;
 
 use ifcanduela\db\traits\ConditionBuilder;
-use function ifcanduela\db\array_flatten;
 
 class SelectQuery extends Query
 {
@@ -254,7 +253,7 @@ class SelectQuery extends Query
         return [];
     }
 
-    public function __tostring()
+    public function __toString()
     {
         if ($this->changed) {
             $this->build();

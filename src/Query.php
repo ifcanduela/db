@@ -25,18 +25,18 @@ abstract class Query
     /**
      * Create a SELECT query.
      *
-     * @param  string $fields List of fields to select
+     * @param string $field,... List of fields to select
      * @return SelectQuery
      */
-    public static function select(string ...$fields)
+    public static function select(string ...$field)
     {
-        return new SelectQuery(...$fields);
+        return new SelectQuery(...$field);
     }
 
     /**
      * Create an INSERT query.
      *
-     * @param  string $table Name of the table to insert into
+     * @param string $table Name of the table to insert into
      * @return InsertQuery
      */
     public static function insert(string $table = null)
@@ -73,7 +73,7 @@ abstract class Query
      * DELETE FROM.
      *
      * @param  string $table
-     * @return static
+     * @return self
      */
     public function table(string $table)
     {
@@ -86,8 +86,8 @@ abstract class Query
     /**
      * Set the list of tables on which a SELECT query operates.
      *
-     * @param  string $table
-     * @return static
+     * @param  string $table,...
+     * @return self
      */
     public function from(string ...$table)
     {
@@ -101,7 +101,7 @@ abstract class Query
      * Set the conditions for SELECT, UPDATE and DELETE queries.
      *
      * @param  array  $conditions
-     * @return static
+     * @return self
      */
     public function where(array $conditions)
     {
@@ -115,7 +115,7 @@ abstract class Query
      * Add conditions for SELECT, UPDATE and DELETE queries with an AND operator.
      *
      * @param  array  $conditions
-     * @return static
+     * @return self
      */
     public function andWhere(array $conditions)
     {
@@ -138,7 +138,7 @@ abstract class Query
      * Add conditions for SELECT, UPDATE and DELETE queries with an ON operator.
      *
      * @param  array  $conditions
-     * @return static
+     * @return self
      */
     public function orWhere(array $conditions)
     {
@@ -185,5 +185,8 @@ abstract class Query
         return $this->placeholders;
     }
 
+    /**
+     * Build the query,
+     */
     abstract protected function build();
 }

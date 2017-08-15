@@ -25,12 +25,58 @@ class Database extends PDO
     /** @var bool */
     private $isWritable = true;
 
-    /** @var array Default PDO options sed by the factory methods */
+    /** @var array Default PDO options set by the factory methods */
     private static $defaultOptions = [
         PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         PDO::ATTR_EMULATE_PREPARES   => false,
     ];
+
+    /**
+     * Create a database connection to SQLite ot MySQL, based on a configuration array.
+     *
+     * Array keys are as follows:
+     *
+     * engine  | required |             | Either 'mysql' or 'sqlite
+     * file    | required | SQLite only | Path and filename or ':memory:'
+     * host    | required | MySQL only  | MySQL host name or IP address
+     * name    | required | MySQL only  | Schema name
+     * user    | optional | MySQL only  | Username
+     * pass    | optional | MySQL only  | Password
+     * options | optional |             | Additional PDO connection options
+     *
+     * @param array $config
+     * @return \ifcanduela\db\Database|null
+     */
+    public static function fromArray(array $config)
+    {
+        if (!isset($config['engine'])) {
+            throw new \InvalidArgumentException("Missing engine");
+        }
+
+        if (!in_array(strtolower($config['engine']), ['sqlite', 'mysql'])) {
+            throw new \InvalidArgumentException("Unsupported engine {$config['engine']}");
+        }
+
+        if ($config['engine'] === 'sqlite') {
+            return static::sqlite(
+                $config['file'],
+                $config['options'] ?? []
+            );
+        }
+
+        if ($config['engine'] === 'mysql') {
+            return static::mysql(
+                    $config['host'],
+                    $config['name'],
+                    $config['user'] ?? null,
+                    $config['pass'] ?? null,
+                    $config['options'] ?? null
+                );
+        }
+
+        return null;
+    }
 
     /**
      * Factory for a Sqlite connection.
@@ -88,11 +134,11 @@ class Database extends PDO
      * @param array $params
      * @param boolean $returnStatement
      * @param int $fetchMode
-     * @return array|int
+     * @return array|int|PDOStatement
      */
     public function run($sql, array $params = [], bool $returnStatement = false, int $fetchMode = PDO::FETCH_ASSOC)
     {
-        if (is_a($sql, Query::class)) {
+        if ($sql instanceof Query) {
             $params = $sql->getParams();
             $sql = $sql->getSql();
         }
@@ -112,7 +158,7 @@ class Database extends PDO
     /**
      * Find out if the database contains a table.
      *
-     * @param string $table Table name
+     * @param string $tableName Table name
      * @return boolean True if the table exists, false otherwise
      */
     public function tableExists(string $tableName)

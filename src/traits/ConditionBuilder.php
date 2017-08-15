@@ -3,6 +3,7 @@
 namespace ifcanduela\db\traits;
 
 use function ifcanduela\db\array_flatten;
+use ifcanduela\db\Expression;
 
 trait ConditionBuilder
 {
@@ -77,13 +78,11 @@ trait ConditionBuilder
             }
 
             return $clause;
-        } else {
-            $placeholder = $this->addPlaceholder($value);
-
-            return is_null($value) ? "{$key} IS NULL" : "{$key} = {$placeholder}";
         }
 
-        throw new \RuntimeException("Invalid condition for {$key}");
+        $placeholder = $this->addPlaceholder($value);
+
+        return is_null($value) ? "{$key} IS NULL" : "{$key} = {$placeholder}";
     }
 
     private function addPlaceholder($value)
@@ -92,7 +91,7 @@ trait ConditionBuilder
             return $value;
         }
 
-        if (is_a($value, \ifcanduela\db\Expression::class)) {
+        if ($value instanceof Expression) {
             return (string) $value;
         }
 

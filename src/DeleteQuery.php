@@ -8,6 +8,11 @@ class DeleteQuery extends Query
 {
     use ConditionBuilder;
 
+    /**
+     * DeleteQuery constructor.
+     *
+     * @param string|NULL $table
+     */
     public function __construct(string $table = null)
     {
         if ($table) {
@@ -15,6 +20,9 @@ class DeleteQuery extends Query
         }
     }
 
+    /**
+     * Build the query,
+     */
     public function build()
     {
         if (!$this->table) {
