@@ -71,7 +71,7 @@ class Database extends PDO
                     $config['name'],
                     $config['user'] ?? null,
                     $config['pass'] ?? null,
-                    $config['options'] ?? null
+                    $config['options'] ?? []
                 );
         }
 
