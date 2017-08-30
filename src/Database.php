@@ -2,9 +2,10 @@
 
 namespace ifcanduela\db;
 
-use \PDO;
-use \PDOException;
-use \PDOStatement;
+use PDO;
+use PDOException;
+use PDOStatement;
+use Psr\Log\LoggerInterface;
 
 /**
  * Wrapper class for PDO database connections.
@@ -24,6 +25,9 @@ class Database extends PDO
 
     /** @var bool */
     private $isWritable = true;
+
+    /** @var Logger */
+    private $logger;
 
     /** @var array Default PDO options set by the factory methods */
     private static $defaultOptions = [
@@ -145,6 +149,7 @@ class Database extends PDO
 
         $stm = $this->prepare($sql);
         $stm->execute($params);
+        $this->logQuery($sql, $params);
 
         if ($returnStatement) {
             return $stm;
@@ -164,12 +169,15 @@ class Database extends PDO
     public function tableExists(string $tableName)
     {
         try {
-            $this->prepare("SELECT 1 FROM {$tableName} LIMIT 1");
+            $sql = "SELECT 1 FROM {$tableName} LIMIT 1";
+            $this->prepare($sql);
+            $this->logQuery("[PREPARE ONLY] $sql");
             return true;
         } catch (PDOException $e) {}
 
         return false;
     }
+
     /**
      * Finds the Primary Key fields of a table.
      *
@@ -205,6 +213,8 @@ class Database extends PDO
         } else {
             throw new \RuntimeException("Unsupported database type: '{$this->databaseType}'");
         }
+
+        $this->logQuery($sql);
 
         # Search all columns for the Primary Key flag
         foreach ($r as $col) {
@@ -250,6 +260,8 @@ class Database extends PDO
             throw new \RuntimeException("Unsupported database type: '{$this->databaseType}'");
         }
 
+        $this->logQuery($sql);
+
         # Add column names to $cols array
         foreach ($r as $i => $col) {
             $colName = $col[$tableNameIndex];
@@ -266,5 +278,29 @@ class Database extends PDO
         }
 
         return $cols;
+    }
+
+    /**
+     * Set up a query logger.
+     *
+     * @param LoggerInterface $logger
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
+    /**
+     * Log a query to the configured logger.
+     *
+     * @param string $sql
+     * @param array $params
+     */
+    public function logQuery(string $sql, array $params = [])
+    {
+        if ($this->logger instanceof LoggerInterface) {
+            $message = $sql . ' => ' . json_encode($params);
+            $this->logger->info($message);
+        }
     }
 }
