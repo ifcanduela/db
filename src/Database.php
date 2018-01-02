@@ -71,12 +71,12 @@ class Database extends PDO
 
         if ($config['engine'] === 'mysql') {
             return static::mysql(
-                    $config['host'],
-                    $config['name'],
-                    $config['user'] ?? null,
-                    $config['pass'] ?? null,
-                    $config['options'] ?? []
-                );
+                $config['host'],
+                $config['name'],
+                $config['user'] ?? null,
+                $config['pass'] ?? null,
+                $config['options'] ?? []
+            );
         }
 
         return null;
@@ -161,6 +161,36 @@ class Database extends PDO
     }
 
     /**
+     * Run a query using a prepared statement and return the first row.
+     *
+     * @param string|Query $sql
+     * @param array $params
+     * @param int $rowNumber
+     * @return array|null
+     */
+    public function getRow($sql, array $params = [], $rowNumber = 0)
+    {
+        $result = $this->run($sql, $params, false, PDO::FETCH_ASSOC);
+
+        return $result[$rowNumber] ?? null;
+    }
+
+    /**
+     * Run a query using a prepared statement and return the first column of the first row.
+     *
+     * @param string|Query $sql
+     * @param array $params
+     * @param int|string $columnName
+     * @return string|null
+     */
+    public function getCell($sql, array $params = [], $columnName = 0)
+    {
+        $result = $this->run($sql, $params, false, PDO::FETCH_BOTH);
+
+        return $result[0][$columnName] ?? null;
+    }
+
+    /**
      * Find out if the database contains a table.
      *
      * @param string $tableName Table name
@@ -188,7 +218,7 @@ class Database extends PDO
      * will be an array.
      *
      * @param string $table Name of the table in the database
-     * @param bool $asArray Return multiple keys as an array (default is true)
+     * @param bool $asArray Return multiple keys as an array (default is false)
      * @return mixed A comma-separated string with the primary key fields or an
      *               array if $asArray is true
      */
@@ -201,24 +231,22 @@ class Database extends PDO
             $primaryKeyIndex = 'Key';
             $primaryKeyValue = 'PRI';
             $tableNameIndex = 'Field';
-            $stm = $this->query($sql);
-            $r = $stm->fetchAll();
         } elseif ($this->databaseType === 'sqlite') {
             $sql = "PRAGMA table_info({$table})";
             $primaryKeyIndex = 'pk';
             $primaryKeyValue = 1;
             $tableNameIndex = 'name';
-            $stm = $this->query($sql);
-            $r = $stm->fetchAll();
         } else {
             throw new \RuntimeException("Unsupported database type: '{$this->databaseType}'");
         }
 
+        $stm = $this->query($sql);
+        $r = $stm->fetchAll();
         $this->logQuery($sql);
 
         # Search all columns for the Primary Key flag
         foreach ($r as $col) {
-            if (($col[$primaryKeyIndex] == $primaryKeyValue)) {
+            if ($col[$primaryKeyIndex] == $primaryKeyValue) {
                 # Add this column to the primary keys list
                 $pk[] = $col[$tableNameIndex];
             }
@@ -247,19 +275,15 @@ class Database extends PDO
         if ($this->databaseType === 'mysql') {
             $sql = "SHOW COLUMNS FROM {$table}";
             $tableNameIndex = 'Field';
-
-            # Get all columns from a selected table
-            $r = $this->query($sql)->fetchAll();
         } elseif ($this->databaseType === 'sqlite') {
             $sql = "PRAGMA table_info({$table})";
             $tableNameIndex = 'name';
-
-            # Get all columns from a selected table
-            $r = $this->query($sql)->fetchAll();
         } else {
             throw new \RuntimeException("Unsupported database type: '{$this->databaseType}'");
         }
 
+        # Get all columns from a selected table
+        $r = $this->query($sql)->fetchAll();
         $this->logQuery($sql);
 
         # Add column names to $cols array

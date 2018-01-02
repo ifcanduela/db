@@ -1,6 +1,7 @@
 <?php
 
 use ifcanduela\db\Query;
+use ifcanduela\db\Count;
 
 use function ifcanduela\db\qi;
 
@@ -353,6 +354,15 @@ class SelectQueryTest extends PHPUnit\Framework\TestCase
         $sql = $q2->getSql();
 
         $this->assertEquals('SELECT * FROM (SELECT * FROM users WHERE (id > :p_1)) WHERE (age = :p_1)', $sql);
+    }
+
+    public function testCountQuery()
+    {
+        $q1 = Query::count()->from('users')->where(['id' => ['>', 1]]);
+
+        $sql = $q1->getSql();
+
+        $this->assertEquals('SELECT COUNT(*), * FROM users WHERE (id > :p_1)', $sql);
     }
 
     public function testQuoteIdentifier()

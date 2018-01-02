@@ -34,6 +34,16 @@ abstract class Query
     }
 
     /**
+     * Create a SELECT COUNT(*) query.
+     *
+     * @return CountQuery
+     */
+    public static function count()
+    {
+        return new CountQuery();
+    }
+
+    /**
      * Create an INSERT query.
      *
      * @param string $table Name of the table to insert into
