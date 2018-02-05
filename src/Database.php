@@ -55,7 +55,7 @@ class Database extends PDO
     public static function fromArray(array $config)
     {
         if (!isset($config['engine'])) {
-            throw new \InvalidArgumentException("Missing engine");
+            throw new \InvalidArgumentException("Missing engine: must be either 'mysql' or 'sqlite'");
         }
 
         if (!in_array(strtolower($config['engine']), ['sqlite', 'mysql'])) {
@@ -168,7 +168,7 @@ class Database extends PDO
      * @param int $rowNumber
      * @return array|null
      */
-    public function getRow($sql, array $params = [], $rowNumber = 0)
+    public function row($sql, array $params = [], $rowNumber = 0)
     {
         $result = $this->run($sql, $params, false, PDO::FETCH_ASSOC);
 
@@ -183,7 +183,7 @@ class Database extends PDO
      * @param int|string $columnName
      * @return string|null
      */
-    public function getCell($sql, array $params = [], $columnName = 0)
+    public function cell($sql, array $params = [], $columnName = 0)
     {
         $result = $this->run($sql, $params, false, PDO::FETCH_BOTH);
 
@@ -204,6 +204,24 @@ class Database extends PDO
             $this->logQuery("[PREPARE ONLY] $sql");
             return true;
         } catch (PDOException $e) {}
+
+        return false;
+    }
+
+    /**
+     * Find out if a table in the database contains a column.
+     *
+     * @param string $tableName Table name
+     * @param string $columnName Column name
+     * @return boolean True if the column exists, false otherwise
+     */
+    public function columnExists(string $tableName, string $columnName)
+    {
+        if ($this->tableExists($tableName)) {
+            $names = array_flip($this->getColumnNames($tableName));
+
+            return array_key_exists($columnName, $names);
+        }
 
         return false;
     }
