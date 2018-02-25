@@ -204,7 +204,9 @@ class SelectQuery extends Query
                 $sql[] = $join[0];
                 $sql[] = $join[1];
                 $sql[] = 'ON';
-                $sql[] = $this->buildConditions($join[2], false);
+                $sql[] = is_string($join[2])
+                       ? $join[2]
+                       : $this->buildConditions($join[2], false);
             }
         }
 
