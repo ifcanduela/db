@@ -80,9 +80,13 @@ trait ConditionBuilder
             return $clause;
         }
 
+        if (is_null($value)) {
+            return "{$key} IS NULL";
+        }
+
         $placeholder = $this->addPlaceholder($value);
 
-        return is_null($value) ? "{$key} IS NULL" : "{$key} = {$placeholder}";
+        return "{$key} = {$placeholder}";
     }
 
     private function addPlaceholder($value)
