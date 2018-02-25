@@ -161,6 +161,32 @@ class Database extends PDO
     }
 
     /**
+     * Get a list of tables in the database.
+     * 
+     * @return string[]
+     */
+    public function tableNames()
+    {
+        if ($this->databaseType === 'mysql') {
+            $sql = "SHOW TABLES";
+        } elseif ($this->databaseType === 'sqlite') {
+            $sql = "SELECT name FROM sqlite_master WHERE type='table'";
+        } else {
+            throw new \RuntimeException("Unsupported database type: '{$this->databaseType}'");
+        }
+        $stm = $this->query($sql);
+        $r = $stm->fetchAll();
+
+        $tables = array_map(function ($t) {
+                return reset($t);
+            }, $r);
+        
+        $this->logQuery($sql);
+
+        return $tables;
+    }
+
+    /**
      * Run a query using a prepared statement and return the first row.
      *
      * @param string|Query $sql
