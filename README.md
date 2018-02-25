@@ -4,7 +4,7 @@ An easy-to-use database connection manager and query builder for SQLite and MySQ
 
 ## Getting started
 
-Install using [Composer](getcomposer.org).
+Install using [Composer](https://getcomposer.org).
 
 ## Connecting to a database
 
@@ -22,7 +22,7 @@ $mysql  = Database::mysql($host, $dbname, $user, $password, $options);
 
 The arguments match those in the [PDO constructor](http://php.net/manual/en/pdo.construct.php).
 
-The following options are set by default when using the static factories go create a connection:
+The following options are set by default when using the static factories to create a connection:
 
 - PDO will throw exceptions on error.
 - Results will be returned as associative arrays.
@@ -41,7 +41,7 @@ $mysql = Database::fromArray([
         'pass' => 'some_password',
     ]);
 
-$db = Database::fromArray([
+$sqlite = Database::fromArray([
         'engine' => 'sqlite',
         'file' => './db.sqlite',
     ]);
@@ -196,13 +196,9 @@ $q = Query::select();
 
 $q->columns('id', 'name', 'age');
 $q->from('users');
-$q->where([
-        'id' => 1,
-    ]);
+$q->where(['id' => 1]);
 $q->orWhere(['id' => 3]);
-$q->andWhere([
-        'age' => ['>', 18],
-    ]);
+$q->andWhere(['age' => ['>', 18]]);
 $q->orderBy('age DESC');
 ```
 

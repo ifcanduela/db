@@ -374,4 +374,14 @@ class SelectQueryTest extends PHPUnit\Framework\TestCase
         $this->assertEquals('`users`.`name` `username`', qi('users.name username', '`'));
         $this->assertEquals('[users].[name] AS [username]', qi('users.name AS username', '[', ']'));
     }
+
+    public function testSelectWhereIsNullWithLimit()
+    {
+        /** @var \ifcanduela\db\SelectQuery $q */
+        $q = Query::select('users.*')->from('users')->where(['id' => null])->limit(1);
+        $sql = $q->getSql();
+        $expect = "SELECT users.* FROM users WHERE (id IS NULL) LIMIT :p_1";
+
+        $this->assertEquals($expect, $sql);
+    }
 }
