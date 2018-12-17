@@ -384,4 +384,39 @@ class SelectQueryTest extends PHPUnit\Framework\TestCase
 
         $this->assertEquals($expect, $sql);
     }
+
+    public function testSelectWithComplexArrayCondition()
+    {
+        /** @var \ifcanduela\db\SelectQuery $q */
+        $q = Query::select()->from('users')->where([
+            'AND',
+            [
+                'a' => 1,
+                'b' => 2,
+                [
+                    'OR',
+                    'c' => 3,
+                    'd' => 4,
+                ]
+            ]
+        ]);
+
+        /** @var \ifcanduela\db\SelectQuery $q2 */
+        $q2 = Query::select()->from('users')
+            ->where(['c' => 3])
+            ->orWhere(['d' => 4])
+            ->andWhere([
+                'a' => 1,
+                'b' => 2,
+            ]);
+
+        $sql = $q->getSql();
+        $sql2 = $q2->getSql();
+
+        $expect = "SELECT * FROM users WHERE ((a = :p_1 AND b = :p_2 AND (c = :p_3 OR d = :p_4)))";
+        $expect2 = "SELECT * FROM users WHERE (((c = :p_1) OR (d = :p_2)) AND (a = :p_3 AND b = :p_4))";
+
+        $this->assertEquals($expect, $sql);
+        $this->assertEquals($expect2, $sql2);
+    }
 }

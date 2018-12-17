@@ -220,3 +220,34 @@ And the parameters array would look like this:
     ":p_3" => 18,
 ]
 ```
+
+#### Complex conditions
+
+If using the `where()` methods is confusing or insufficient, you can use simple arrays
+to specify nested conditions:
+
+```php
+$q = Query::select()->where([
+        'AND',
+        [
+            'a' => 1,
+            'b' => 2,
+            [
+                'OR',
+                'c' => 3,
+            ]
+        ]
+    ]);
+```
+
+Which will result in something like this:
+
+```sql
+SELECT *
+FROM users 
+WHERE a = :p_1 AND b = :p_2 AND (c = :p_3 OR d = :p_4)
+```
+
+## License
+
+[MIT](LICENSE).

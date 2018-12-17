@@ -9,6 +9,8 @@ trait ConditionBuilder
 {
     /** @var int */
     protected $placeholderCounter = 1;
+
+    /** @var bool  */
     protected $usePlaceholders = true;
 
     public function buildConditions(array $conditions, $usePlaceholders = true)
@@ -17,16 +19,20 @@ trait ConditionBuilder
         $c = [];
         $joiner = 'AND';
 
-        foreach ($conditions as $i => $condition) {
-            if ($i === 0) {
+        $i = 0;
+
+        foreach ($conditions as $key => $condition) {
+            if ($i === 0 && $key === 0) {
                 // it's an AND/OR
                 $joiner = strtoupper($condition);
                 continue;
-            } elseif (is_numeric($i)) {
+            } elseif (is_numeric($key)) {
                 $c[] = $this->buildConditions($condition, $usePlaceholders);
             } else {
-                $c[] = $this->buildCondition($i, $condition, $usePlaceholders);
+                $c[] = $this->buildCondition($key, $condition, $usePlaceholders);
             }
+
+            $i++;
         }
 
         return '(' . implode(" {$joiner} ", $c) . ')';
