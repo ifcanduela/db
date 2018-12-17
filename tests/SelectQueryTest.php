@@ -390,14 +390,12 @@ class SelectQueryTest extends PHPUnit\Framework\TestCase
         /** @var \ifcanduela\db\SelectQuery $q */
         $q = Query::select()->from('users')->where([
             'AND',
+            'a' => 1,
+            'b' => 2,
             [
-                'a' => 1,
-                'b' => 2,
-                [
-                    'OR',
-                    'c' => 3,
-                    'd' => 4,
-                ]
+                'OR',
+                'c' => 3,
+                'd' => 4,
             ]
         ]);
 
@@ -413,7 +411,7 @@ class SelectQueryTest extends PHPUnit\Framework\TestCase
         $sql = $q->getSql();
         $sql2 = $q2->getSql();
 
-        $expect = "SELECT * FROM users WHERE ((a = :p_1 AND b = :p_2 AND (c = :p_3 OR d = :p_4)))";
+        $expect = "SELECT * FROM users WHERE (a = :p_1 AND b = :p_2 AND (c = :p_3 OR d = :p_4))";
         $expect2 = "SELECT * FROM users WHERE (((c = :p_1) OR (d = :p_2)) AND (a = :p_3 AND b = :p_4))";
 
         $this->assertEquals($expect, $sql);

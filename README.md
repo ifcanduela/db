@@ -229,13 +229,12 @@ to specify nested conditions:
 ```php
 $q = Query::select()->where([
         'AND',
+        'a' => 1,
+        'b' => 2,
         [
-            'a' => 1,
-            'b' => 2,
-            [
-                'OR',
-                'c' => 3,
-            ]
+            'OR',
+            'c' => 3,
+            'd' => 4,
         ]
     ]);
 ```
