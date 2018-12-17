@@ -32,6 +32,11 @@ class SelectQuery extends Query
 
     use ConditionBuilder;
 
+    /**
+     * Create a SELECT query builder.
+     * 
+     * @param string $columns
+     */
     public function __construct(string ...$columns)
     {
         if ($columns) {
@@ -39,6 +44,12 @@ class SelectQuery extends Query
         }
     }
 
+    /**
+     * Toggle the DISTINCT flag in a SELECT query.
+     * 
+     * @param bool $enable
+     * @return self
+     */
     public function distinct(bool $enable = true)
     {
         $this->changed = true;
@@ -47,6 +58,12 @@ class SelectQuery extends Query
         return $this;
     }
 
+    /**
+     * Set the columns for the SELECT query.
+     * 
+     * @param string $column
+     * @return self
+     */
     public function columns(string ...$column)
     {
         $this->changed = true;
@@ -55,6 +72,27 @@ class SelectQuery extends Query
         return $this;
     }
 
+    /**
+     * Append columns for the SELECT query.
+     * 
+     * @param string $column [description]
+     * @return self
+     */
+    public function addColumns(...$column)
+    {
+        $this->changed = true;
+        $this->columns += $column;
+
+        return $this;
+    }
+
+    /**
+     * Setup a JOIN table.
+     * 
+     * @param string $table
+     * @param array $on
+     * @return self
+     */
     public function join(string $table, array $on)
     {
         $this->changed = true;
@@ -63,6 +101,13 @@ class SelectQuery extends Query
         return $this;
     }
 
+    /**
+     * Setup a INNER JOIN table.
+     * 
+     * @param string $table
+     * @param array $on
+     * @return self
+     */
     public function innerJoin(string $table, array $on)
     {
         $this->changed = true;
@@ -71,6 +116,13 @@ class SelectQuery extends Query
         return $this;
     }
 
+    /**
+     * Setup a LEFT JOIN table.
+     * 
+     * @param string $table
+     * @param array $on
+     * @return self
+     */
     public function leftJoin(string $table, array $on)
     {
         $this->changed = true;
@@ -79,6 +131,13 @@ class SelectQuery extends Query
         return $this;
     }
 
+    /**
+     * Setup a LEFT OUTER JOIN table.
+     * 
+     * @param string $table
+     * @param array $on
+     * @return self
+     */
     public function leftOuterJoin(string $table, array $on)
     {
         $this->changed = true;
@@ -87,6 +146,13 @@ class SelectQuery extends Query
         return $this;
     }
 
+    /**
+     * Setup a RIGHT JOIN table.
+     * 
+     * @param string $table
+     * @param array $on
+     * @return self
+     */
     public function rightJoin(string $table, array $on)
     {
         $this->changed = true;
@@ -95,6 +161,13 @@ class SelectQuery extends Query
         return $this;
     }
 
+    /**
+     * Setup a OUTER JOIN table.
+     * 
+     * @param string $table
+     * @param array $on
+     * @return self
+     */
     public function outerJoin(string $table, array $on)
     {
         $this->changed = true;
@@ -103,6 +176,13 @@ class SelectQuery extends Query
         return $this;
     }
 
+    /**
+     * Setup a FULL OUTER JOIN table.
+     * 
+     * @param string $table
+     * @param array $on
+     * @return self
+     */
     public function fullOuterJoin(string $table, array $on)
     {
         $this->changed = true;
@@ -111,6 +191,12 @@ class SelectQuery extends Query
         return $this;
     }
 
+    /**
+     * Set grouping fields to the query.
+     * 
+     * @param string $field
+     * @return self
+     */
     public function groupBy(string ...$field)
     {
         $this->changed = true;
@@ -119,6 +205,16 @@ class SelectQuery extends Query
         return $this;
     }
 
+    /**
+     * Set the conditions for groups in HAVING clauses.
+     *
+     * NOTE: Placeholders in HAVING clauses don't work with SQLite, according to 
+     * the PHP bug referenced in the @see tag below.
+     *
+     * @param array $conditions
+     * @return self
+     * @see https://bugs.php.net/bug.php?id=60281
+     */
     public function having(array $conditions)
     {
         $this->changed = true;
@@ -127,6 +223,16 @@ class SelectQuery extends Query
         return $this;
     }
 
+    /**
+     * Add AND conditions for groups in HAVING clauses.
+     *
+     * NOTE: Placeholders in HAVING clauses don't work with SQLite, according to 
+     * the PHP bug referenced in the @see tag below.
+     *
+     * @param array $conditions
+     * @return self
+     * @see https://bugs.php.net/bug.php?id=60281
+     */
     public function andHaving(array $conditions)
     {
         $this->changed = true;
@@ -139,6 +245,16 @@ class SelectQuery extends Query
         return $this;
     }
 
+    /**
+     * Add OR conditions for groups in HAVING clauses.
+     *
+     * NOTE: Placeholders in HAVING clauses don't work with SQLite, according to 
+     * the PHP bug referenced in the @see tag below.
+     *
+     * @param array $conditions
+     * @return self
+     * @see https://bugs.php.net/bug.php?id=60281
+     */
     public function orHaving(array $conditions)
     {
         $this->changed = true;
@@ -151,6 +267,12 @@ class SelectQuery extends Query
         return $this;
     }
 
+    /**
+     * Setup fields for the ORDER BY clause.
+     * 
+     * @param string $field
+     * @return self
+     */
     public function orderBy(string ...$field)
     {
         $this->changed = true;
@@ -159,6 +281,13 @@ class SelectQuery extends Query
         return $this;
     }
 
+    /**
+     * Set a LIMIT and optional OFFSET.
+     * 
+     * @param int $limit
+     * @param int|null $offset
+     * @return self
+     */
     public function limit(int $limit, int $offset = null)
     {
         $this->changed = true;
@@ -171,6 +300,12 @@ class SelectQuery extends Query
         return $this;
     }
 
+    /**
+     * Set an OFFSET to the LIMIT clause.
+     * 
+     * @param int $offset
+     * @return self
+     */
     public function offset(int $offset)
     {
         $this->changed = true;
@@ -179,6 +314,11 @@ class SelectQuery extends Query
         return $this;
     }
 
+    /**
+     * Build the SELECT query.
+     * 
+     * @return null
+     */
     protected function build()
     {
         if (!$this->from) {
@@ -251,10 +391,13 @@ class SelectQuery extends Query
 
         $this->sql = implode(' ', $sql);
         $this->changed = false;
-
-        return [];
     }
 
+    /**
+     * Get a string representation of the query.
+     * 
+     * @return string
+     */
     public function __toString()
     {
         if ($this->changed) {
