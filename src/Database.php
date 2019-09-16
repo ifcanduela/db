@@ -153,7 +153,7 @@ class Database extends PDO
 
         if ($returnStatement) {
             return $stm;
-        } elseif (substr(trim($sql), 0, 6) === 'SELECT') {
+        } elseif ($this->isSelectQuery($sql)) {
             return $stm->fetchAll($fetchMode);
         } else {
             return $stm->rowCount();
@@ -371,4 +371,19 @@ class Database extends PDO
             $this->logger->info($message);
         }
     }
+
+    /**
+     * Check if a SQL string represents a SELECT query.
+     *
+     * @param string $sql
+     * @return bool
+     */
+    protected function isSelectQuery(string $sql)
+    {
+        $start = substr(trim($sql), 0, 6);
+        $command = strtoupper($start);
+
+        return $command === 'SELECT';
+    }
+
 }
