@@ -29,6 +29,9 @@ class Database extends PDO
     /** @var Logger */
     private $logger;
 
+    /** @var array */
+    private $queryHistory = [];
+
     /** @var array Default PDO options set by the factory methods */
     private static $defaultOptions = [
         PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
@@ -41,7 +44,7 @@ class Database extends PDO
      *
      * Array keys are as follows:
      *
-     * engine  | required |             | Either 'mysql' or 'sqlite
+     * engine  | required |             | Either 'mysql' or 'sqlite'
      * file    | required | SQLite only | Path and filename or ':memory:'
      * host    | required | MySQL only  | MySQL host name or IP address
      * name    | required | MySQL only  | Schema name
@@ -148,21 +151,23 @@ class Database extends PDO
         }
 
         $stm = $this->prepare($sql);
-        $stm->execute($params);
-        $this->logQuery($sql, $params);
+        $success, $stm->execute($params);
+        $affectedRows = $stm->rowCount();
+
+        $this->logQuery($sql, $params, $success, $affectedRows);
 
         if ($returnStatement) {
             return $stm;
         } elseif ($this->isSelectQuery($sql)) {
             return $stm->fetchAll($fetchMode);
         } else {
-            return $stm->rowCount();
+            return $affectedRows;
         }
     }
 
     /**
      * Get a list of tables in the database.
-     * 
+     *
      * @return string[]
      */
     public function tableNames()
@@ -180,7 +185,7 @@ class Database extends PDO
         $tables = array_map(function ($t) {
                 return reset($t);
             }, $r);
-        
+
         $this->logQuery($sql);
 
         return $tables;
@@ -363,11 +368,20 @@ class Database extends PDO
      *
      * @param string $sql
      * @param array $params
+     * @param bool $success
+     * @param int $affectedRows
      */
-    public function logQuery(string $sql, array $params = [])
+    public function logQuery(string $sql, array $params = [], $success, $affectedRows)
     {
+        $this->queryHistory[] = [microtime(true), $sql, $params, $success, $affectedRows];
+
         if ($this->logger instanceof LoggerInterface) {
             $message = $sql . ' => ' . json_encode($params);
+
+            if (!$success) {
+                $message = "[ERROR] {$message}";
+            }
+
             $this->logger->info($message);
         }
     }
@@ -386,4 +400,15 @@ class Database extends PDO
         return $command === 'SELECT';
     }
 
+    /**
+     * Get all queries run by this database connection.
+     *
+     * Returns an array with queries as arrays of <timestamp: float, sql: string, params: array>
+     *
+     * @return array
+     */
+    public function getQueryHistory()
+    {
+        return $this->queryHistory;
+    }
 }
