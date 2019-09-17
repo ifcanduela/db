@@ -149,14 +149,12 @@ class Database extends PDO
             throw new \RuntimeException("Unsupported database type: `{$this->databaseType}`");
         }
 
-        $stm = $this->query($sql);
-        $r = $stm->fetchAll();
+        # Get a list of the tables
+        $r = $this->query($sql)->fetchAll();
 
         $tables = array_map(function ($t) {
                 return reset($t);
             }, $r);
-
-        $this->logQuery($sql);
 
         return $tables;
     }
@@ -185,7 +183,6 @@ class Database extends PDO
 
         # Get all columns from a selected table
         $r = $this->query($sql)->fetchAll();
-        $this->logQuery($sql);
 
         # Add column names to $cols array
         foreach ($r as $i => $col) {
@@ -237,9 +234,7 @@ class Database extends PDO
             throw new \RuntimeException("Unsupported database type: `{$this->databaseType}`");
         }
 
-        $stm = $this->query($sql);
-        $r = $stm->fetchAll();
-        $this->logQuery($sql);
+        $r = $this->query($sql)->fetchAll();
 
         # Search all columns for the Primary Key flag
         foreach ($r as $col) {
@@ -319,7 +314,7 @@ class Database extends PDO
     public function query(string $statement)
     {
         $result = parent::query(...func_get_args());
-        $this->logQuery($statement, [], true, null);
+        $this->logQuery($statement, [], true, $result->rowCount());
 
         return $result;
     }
@@ -345,9 +340,8 @@ class Database extends PDO
 
         $stm = $this->prepare($sql);
         $success = $stm->execute($params);
-        $affectedRows = $stm->rowCount();
 
-        $this->logQuery($sql, $params, $success, $affectedRows);
+        $this->logQuery($sql, $params, $success, $stm->rowCount());
 
         if ($returnStatement) {
             return $stm;
