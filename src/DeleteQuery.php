@@ -29,15 +29,15 @@ class DeleteQuery extends Query
             throw new \RuntimeException("No tables provided for FROM clause");
         }
 
-        $sql = ['DELETE FROM'];
+        $sql = ["DELETE FROM"];
         $sql[] = $this->table;
 
         if ($this->conditions) {
-            $sql[] = 'WHERE';
+            $sql[] = "WHERE";
             $sql[] = $this->buildConditions($this->conditions);
         }
 
-        $this->sql = implode(' ', $sql);
+        $this->sql = implode(" ", $sql);
 
         $this->changed = false;
     }

@@ -60,13 +60,13 @@ class InsertQuery extends Query
             throw new \RuntimeException("No values provided for INSERT clause");
         }
 
-        $sql = ['INSERT INTO'];
+        $sql = ["INSERT INTO"];
         $sql[] = $this->table;
 
         $columns = array_keys($this->values[0]);
-        $sql[] = '(' . implode(', ', $columns) . ')';
+        $sql[] = "(" . implode(", ", $columns) . ")";
 
-        $sql[] = 'VALUES';
+        $sql[] = "VALUES";
         $values = [];
 
         foreach ($this->values as $row) {
@@ -75,12 +75,12 @@ class InsertQuery extends Query
                 $row_values[] = $this->addPlaceholder($value);
             }
 
-            $values[] = '(' . implode(', ', $row_values) . ')';
+            $values[] = "(" . implode(", ", $row_values) . ")";
         }
 
-        $sql[] = implode(', ', $values);
+        $sql[] = implode(", ", $values);
 
-        $this->sql = implode(' ', $sql);
+        $this->sql = implode(" ", $sql);
         $this->changed = false;
     }
 }

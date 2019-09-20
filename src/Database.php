@@ -60,11 +60,11 @@ class Database extends PDO
      */
     public static function fromArray(array $config)
     {
-        if (!isset($config['engine'])) {
+        if (!isset($config["engine"])) {
             throw new \InvalidArgumentException("Missing engine: must be either 'mysql' or 'sqlite'");
         }
 
-        if (!in_array(strtolower($config['engine']), [self::DB_MYSQL, self::DB_SQLITE])) {
+        if (!in_array(strtolower($config["engine"]), [self::DB_MYSQL, self::DB_SQLITE])) {
             throw new \InvalidArgumentException("Unsupported engine `{$config['engine']}`");
         }
 
@@ -176,7 +176,7 @@ class Database extends PDO
             $tableNameIndex = "Field";
         } elseif ($this->databaseType === self::DB_SQLITE) {
             $sql = "PRAGMA table_info({$table})";
-            $tableNameIndex = 'name';
+            $tableNameIndex = "name";
         } else {
             throw new \RuntimeException("Unsupported database type: `{$this->databaseType}`");
         }
@@ -246,7 +246,7 @@ class Database extends PDO
 
         # if the return value is preferred as string
         if (!$asArray) {
-            $pk = join(',', $pk);
+            $pk = join(",", $pk);
         }
 
         return $pk;
@@ -348,7 +348,7 @@ class Database extends PDO
         } elseif ($this->isSelectQuery($sql)) {
             return $stm->fetchAll($fetchMode);
         } else {
-            return $affectedRows;
+            return $stm->rowCount();
         }
     }
 

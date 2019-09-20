@@ -10,7 +10,7 @@ class SelectQuery extends Query
     protected $distinct = false;
 
     /** @var string[] */
-    protected $columns = ['*'];
+    protected $columns = ["*"];
 
     /** @var array */
     protected $joins = [];
@@ -34,7 +34,7 @@ class SelectQuery extends Query
 
     /**
      * Create a SELECT query builder.
-     * 
+     *
      * @param string $columns
      */
     public function __construct(string ...$columns)
@@ -46,7 +46,7 @@ class SelectQuery extends Query
 
     /**
      * Toggle the DISTINCT flag in a SELECT query.
-     * 
+     *
      * @param bool $enable
      * @return self
      */
@@ -60,7 +60,7 @@ class SelectQuery extends Query
 
     /**
      * Set the columns for the SELECT query.
-     * 
+     *
      * @param string $column
      * @return self
      */
@@ -74,7 +74,7 @@ class SelectQuery extends Query
 
     /**
      * Append columns for the SELECT query.
-     * 
+     *
      * @param string $column [description]
      * @return self
      */
@@ -88,7 +88,7 @@ class SelectQuery extends Query
 
     /**
      * Setup a JOIN table.
-     * 
+     *
      * @param string $table
      * @param array $on
      * @return self
@@ -96,14 +96,14 @@ class SelectQuery extends Query
     public function join(string $table, array $on)
     {
         $this->changed = true;
-        $this->joins[] = ['JOIN', $table, $on];
+        $this->joins[] = ["JOIN", $table, $on];
 
         return $this;
     }
 
     /**
      * Setup a INNER JOIN table.
-     * 
+     *
      * @param string $table
      * @param array $on
      * @return self
@@ -111,14 +111,14 @@ class SelectQuery extends Query
     public function innerJoin(string $table, array $on)
     {
         $this->changed = true;
-        $this->joins[] = ['INNER JOIN', $table, $on];
+        $this->joins[] = ["INNER JOIN", $table, $on];
 
         return $this;
     }
 
     /**
      * Setup a LEFT JOIN table.
-     * 
+     *
      * @param string $table
      * @param array $on
      * @return self
@@ -126,14 +126,14 @@ class SelectQuery extends Query
     public function leftJoin(string $table, array $on)
     {
         $this->changed = true;
-        $this->joins[] = ['LEFT JOIN', $table, $on];
+        $this->joins[] = ["LEFT JOIN", $table, $on];
 
         return $this;
     }
 
     /**
      * Setup a LEFT OUTER JOIN table.
-     * 
+     *
      * @param string $table
      * @param array $on
      * @return self
@@ -141,14 +141,14 @@ class SelectQuery extends Query
     public function leftOuterJoin(string $table, array $on)
     {
         $this->changed = true;
-        $this->joins[] = ['LEFT OUTER JOIN', $table, $on];
+        $this->joins[] = ["LEFT OUTER JOIN", $table, $on];
 
         return $this;
     }
 
     /**
      * Setup a RIGHT JOIN table.
-     * 
+     *
      * @param string $table
      * @param array $on
      * @return self
@@ -156,14 +156,14 @@ class SelectQuery extends Query
     public function rightJoin(string $table, array $on)
     {
         $this->changed = true;
-        $this->joins[] = ['RIGHT JOIN', $table, $on];
+        $this->joins[] = ["RIGHT JOIN", $table, $on];
 
         return $this;
     }
 
     /**
      * Setup a OUTER JOIN table.
-     * 
+     *
      * @param string $table
      * @param array $on
      * @return self
@@ -171,14 +171,14 @@ class SelectQuery extends Query
     public function outerJoin(string $table, array $on)
     {
         $this->changed = true;
-        $this->joins[] = ['OUTER JOIN', $table, $on];
+        $this->joins[] = ["OUTER JOIN", $table, $on];
 
         return $this;
     }
 
     /**
      * Setup a FULL OUTER JOIN table.
-     * 
+     *
      * @param string $table
      * @param array $on
      * @return self
@@ -186,14 +186,14 @@ class SelectQuery extends Query
     public function fullOuterJoin(string $table, array $on)
     {
         $this->changed = true;
-        $this->joins[] = ['FULL OUTER JOIN', $table, $on];
+        $this->joins[] = ["FULL OUTER JOIN", $table, $on];
 
         return $this;
     }
 
     /**
      * Set grouping fields to the query.
-     * 
+     *
      * @param string $field
      * @return self
      */
@@ -208,7 +208,7 @@ class SelectQuery extends Query
     /**
      * Set the conditions for groups in HAVING clauses.
      *
-     * NOTE: Placeholders in HAVING clauses don't work with SQLite, according to 
+     * NOTE: Placeholders in HAVING clauses don't work with SQLite, according to
      * the PHP bug referenced in the @see tag below.
      *
      * @param array $conditions
@@ -226,7 +226,7 @@ class SelectQuery extends Query
     /**
      * Add AND conditions for groups in HAVING clauses.
      *
-     * NOTE: Placeholders in HAVING clauses don't work with SQLite, according to 
+     * NOTE: Placeholders in HAVING clauses don't work with SQLite, according to
      * the PHP bug referenced in the @see tag below.
      *
      * @param array $conditions
@@ -237,7 +237,7 @@ class SelectQuery extends Query
     {
         $this->changed = true;
         $this->having = [
-            'AND',
+            "AND",
             $this->having,
             $conditions,
         ];
@@ -248,7 +248,7 @@ class SelectQuery extends Query
     /**
      * Add OR conditions for groups in HAVING clauses.
      *
-     * NOTE: Placeholders in HAVING clauses don't work with SQLite, according to 
+     * NOTE: Placeholders in HAVING clauses don't work with SQLite, according to
      * the PHP bug referenced in the @see tag below.
      *
      * @param array $conditions
@@ -259,7 +259,7 @@ class SelectQuery extends Query
     {
         $this->changed = true;
         $this->having = [
-            'OR',
+            "OR",
             $this->having,
             $conditions,
         ];
@@ -269,7 +269,7 @@ class SelectQuery extends Query
 
     /**
      * Setup fields for the ORDER BY clause.
-     * 
+     *
      * @param string $field
      * @return self
      */
@@ -283,7 +283,7 @@ class SelectQuery extends Query
 
     /**
      * Set a LIMIT and optional OFFSET.
-     * 
+     *
      * @param int $limit
      * @param int|null $offset
      * @return self
@@ -302,7 +302,7 @@ class SelectQuery extends Query
 
     /**
      * Set an OFFSET to the LIMIT clause.
-     * 
+     *
      * @param int $offset
      * @return self
      */
@@ -316,7 +316,7 @@ class SelectQuery extends Query
 
     /**
      * Build the SELECT query.
-     * 
+     *
      * @return null
      */
     protected function build()
@@ -328,22 +328,22 @@ class SelectQuery extends Query
         $this->placeholders = [];
         $this->placeholderCounter = 1;
 
-        $sql = ['SELECT'];
+        $sql = ["SELECT"];
 
         if ($this->distinct) {
-            $sql[] = 'DISTINCT';
+            $sql[] = "DISTINCT";
         }
 
-        $sql[] = implode(', ', $this->columns);
+        $sql[] = implode(", ", $this->columns);
 
-        $sql[] = 'FROM';
-        $sql[] = implode(', ', $this->from);
+        $sql[] = "FROM";
+        $sql[] = implode(", ", $this->from);
 
         if ($this->joins) {
             foreach ($this->joins as $join) {
                 $sql[] = $join[0];
                 $sql[] = $join[1];
-                $sql[] = 'ON';
+                $sql[] = "ON";
                 $sql[] = is_string($join[2])
                        ? $join[2]
                        : $this->buildConditions($join[2], false);
@@ -351,27 +351,27 @@ class SelectQuery extends Query
         }
 
         if ($this->conditions) {
-            $sql[] = 'WHERE';
+            $sql[] = "WHERE";
             $sql[] = $this->buildConditions($this->conditions);
         }
 
         if ($this->groupBy) {
-            $sql[] = 'GROUP BY';
-            $sql[] = implode(', ', $this->groupBy);
+            $sql[] = "GROUP BY";
+            $sql[] = implode(", ", $this->groupBy);
         }
 
         if ($this->having) {
-            $sql[] = 'HAVING';
+            $sql[] = "HAVING";
             $sql[] = $this->buildConditions($this->having);
         }
 
         if ($this->orderBy) {
-            $sql[] = 'ORDER BY';
-            $sql[] = implode(', ', $this->orderBy);
+            $sql[] = "ORDER BY";
+            $sql[] = implode(", ", $this->orderBy);
         }
 
         if ($this->limit || $this->offset) {
-            $sql[] = 'LIMIT';
+            $sql[] = "LIMIT";
 
             $parts = [];
 
@@ -386,16 +386,16 @@ class SelectQuery extends Query
                 $parts[] = $this->addPlaceholder($this->limit);
             }
 
-            $sql[] = implode(', ', $parts);
+            $sql[] = implode(", ", $parts);
         }
 
-        $this->sql = implode(' ', $sql);
+        $this->sql = implode(" ", $sql);
         $this->changed = false;
     }
 
     /**
      * Get a string representation of the query.
-     * 
+     *
      * @return string
      */
     public function __toString()

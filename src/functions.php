@@ -34,24 +34,24 @@ function raw($expression)
  * @param string $endQuote Defaults to double quote (")
  * @return string
  */
-function qi($identifier, $startQuote = '"', $endQuote = null)
+function qi($identifier, $startQuote = "\"", $endQuote = null)
 {
     if ($endQuote === null) {
         $endQuote = $startQuote;
     }
 
-    $words = explode(' ', $identifier);
+    $words = explode(" ", $identifier);
     $parts = [];
 
     foreach ($words as $i => $w) {
-        if ($w === '*') {
-            $parts[] = '*';
-        } elseif ($i > 0 && strtoupper($w) == 'AS') {
-            $parts[] = 'AS';
+        if ($w === "*") {
+            $parts[] = "*";
+        } elseif ($i > 0 && strtoupper($w) == "AS") {
+            $parts[] = "AS";
         } else {
-            $parts[] = str_replace('.', "{$endQuote}.{$startQuote}", "{$startQuote}{$w}{$endQuote}");
+            $parts[] = str_replace(".", "{$endQuote}.{$startQuote}", "{$startQuote}{$w}{$endQuote}");
         }
     }
 
-    return implode(' ', $parts);
+    return implode(" ", $parts);
 }

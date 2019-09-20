@@ -17,7 +17,7 @@ trait ConditionBuilder
     {
         $this->usePlaceholders = $usePlaceholders;
         $c = [];
-        $joiner = 'AND';
+        $joiner = "AND";
 
         $i = 0;
 
@@ -35,7 +35,7 @@ trait ConditionBuilder
             $i++;
         }
 
-        return '(' . implode(" {$joiner} ", $c) . ')';
+        return "(" . implode(" {$joiner} ", $c) . ")";
     }
 
     public function buildCondition($key, $value, $usePlaceholders = true)
@@ -47,8 +47,8 @@ trait ConditionBuilder
             $operator = strtoupper(array_shift($value));
 
             switch ($operator) {
-                case 'IN':
-                case 'NOT IN':
+                case "IN":
+                case "NOT IN":
                     $placeholders = [];
                     $values = array_flatten($value);
 
@@ -56,24 +56,24 @@ trait ConditionBuilder
                         $placeholders[] = $this->addPlaceholder($v);
                     }
 
-                    $s = implode(', ', $placeholders);
+                    $s = implode(", ", $placeholders);
 
                     $clause = "{$key} {$operator} ({$s})";
                     break;
-                case 'IS':
-                case 'NOT IS':
-                case 'IS NOT':
+                case "IS":
+                case "NOT IS":
+                case "IS NOT":
                     $clause = "{$key} {$operator} NULL";
                     break;
-                case 'BETWEEN':
-                case 'NOT BETWEEN':
+                case "BETWEEN":
+                case "NOT BETWEEN":
                     $from_placeholder = $this->addPlaceholder($value[0]);
                     $to_placeholder = $this->addPlaceholder($value[1]);
 
                     $clause = "{$key} {$operator} {$from_placeholder} AND {$to_placeholder}";
                     break;
-                case 'LIKE':
-                case 'NOT LIKE':
+                case "LIKE":
+                case "NOT LIKE":
                     $placeholder = $this->addPlaceholder($value[0]);
                     $clause = "{$key} {$operator} {$placeholder}";
                     break;
@@ -105,11 +105,10 @@ trait ConditionBuilder
             return (string) $value;
         }
 
-        $placeholderName = ':p_' . $this->placeholderCounter;
+        $placeholderName = ":p_" . $this->placeholderCounter;
         $this->placeholderCounter++;
         $this->placeholders[$placeholderName] = $value;
 
         return $placeholderName;
     }
-
 }

@@ -133,7 +133,7 @@ abstract class Query
 
         if ($this->conditions) {
             $this->conditions = [
-                'AND',
+                "AND",
                 $this->conditions,
                 $conditions,
             ];
@@ -156,7 +156,7 @@ abstract class Query
 
         if ($this->conditions) {
             $this->conditions = [
-                'OR',
+                "OR",
                 $this->conditions,
                 $conditions,
             ];

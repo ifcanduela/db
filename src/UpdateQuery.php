@@ -8,6 +8,7 @@ class UpdateQuery extends Query
 {
     /** @var string */
     protected $table;
+
     /** @var array */
     protected $set;
 
@@ -47,10 +48,10 @@ class UpdateQuery extends Query
             throw new \RuntimeException("No columns provided for UPDATE clause");
         }
 
-        $sql = ['UPDATE'];
+        $sql = ["UPDATE"];
         $sql[] = $this->table;
 
-        $sql[] = 'SET';
+        $sql[] = "SET";
         $set = [];
 
         foreach ($this->set as $field => $value) {
@@ -58,14 +59,14 @@ class UpdateQuery extends Query
             $set[] = "{$field} = {$placeholder}";
         }
 
-        $sql[] = implode(', ', $set);
+        $sql[] = implode(", ", $set);
 
         if ($this->conditions) {
-            $sql[] = 'WHERE';
+            $sql[] = "WHERE";
             $sql[] = $this->buildConditions($this->conditions);
         }
 
-        $this->sql = implode(' ', $sql);
+        $this->sql = implode(" ", $sql);
 
         $this->changed = false;
     }
