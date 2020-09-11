@@ -369,9 +369,11 @@ class SelectQueryTest extends PHPUnit\Framework\TestCase
     {
         $this->assertEquals('"username"', qi('username'));
         $this->assertEquals('`users`', qi('users', '`'));
+        $this->assertEquals('users', qi('users', ''));
         $this->assertEquals('[users]', qi('users', '[', ']'));
         $this->assertEquals('"users"."name" AS "username"', qi('users.name AS username'));
         $this->assertEquals('`users`.`name` `username`', qi('users.name username', '`'));
+        $this->assertEquals('users.name username', qi('users.name username', ''));
         $this->assertEquals('[users].[name] AS [username]', qi('users.name AS username', '[', ']'));
     }
 

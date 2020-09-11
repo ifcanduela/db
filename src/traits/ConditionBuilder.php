@@ -50,7 +50,7 @@ trait ConditionBuilder
                 case "IN":
                 case "NOT IN":
                     $placeholders = [];
-                    $values = array_flatten($value);
+                    $values = array_values(array_unique(array_flatten($value)));
 
                     foreach ($values as $v) {
                         $placeholders[] = $this->addPlaceholder($v);

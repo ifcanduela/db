@@ -44,7 +44,7 @@ class DatabaseTest extends PHPUnit\Framework\TestCase
     public function testGetTables()
     {
         $d = $this->getSqliteDatabase();
-        $tables = $d->tableNames();
+        $tables = $d->getTableNames();
         $this->assertEquals(['users'], $tables);
     }
 
@@ -55,7 +55,7 @@ class DatabaseTest extends PHPUnit\Framework\TestCase
         }
 
         $d = $this->getMysqlDatabase();
-        $tables = $d->tableNames();
+        $tables = $d->getTableNames();
         $this->assertEquals(['city', 'country', 'countrylanguage'], $tables);
     }
 
