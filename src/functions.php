@@ -15,7 +15,8 @@ function array_flatten(array $array)
 }
 
 /**
- * [raw description]
+ * Create a raw SQL expression.
+ *
  * @param mixed $expression
  * @return \ifcanduela\db\Expression
  */
@@ -54,4 +55,75 @@ function qi($identifier, $startQuote = "\"", $endQuote = null)
     }
 
     return implode(" ", $parts);
+}
+
+function quote_identifier_column(string $str)
+{
+    if (in_array($str[0], ["(", "`", "*"])) {
+        return $str;
+    }
+
+    $isFunction = false;
+    $tableName = "";
+    $columnName = $str;
+    $alias = "";
+
+    $columnName = trim($columnName);
+
+    if ($space = mb_strpos($str, " ") > -1) {
+        [$columnName, $alias] = array_map("trim", explode(" ", $columnName, 2));
+        $alias = trim($alias);
+        $as = strtoupper(mb_substr($alias, 0, 3));
+
+        if ($as === "AS ") {
+            $alias = trim(mb_substr($alias, 3));
+        }
+    }
+
+    if (preg_match("/(\w+)\((.+)\)/", $columnName, $subpatterns) === 1) {
+        $isFunction = $subpatterns[1];
+        $columnName = $subpatterns[2];
+    }
+
+    if (mb_strpos($columnName, ".") > -1) {
+        $columnName = array_map("trim", explode(".", $columnName));
+    }
+
+    if (!is_array($columnName)) {
+        $columnName = [$columnName];
+    }
+
+    $columnName = array_map(function ($columnName) {
+        return $columnName === "*" ? $columnName : "`{$columnName}`";
+    }, array_filter($columnName));
+
+    $columnName = implode(".", $columnName);
+    $alias = $alias && $alias[0] !== "`"? "`{$alias}`" : $alias;
+
+    $result = $isFunction ? "{$isFunction}(${columnName})" : $columnName;
+
+    if ($alias) {
+        $result = "$result AS $alias";
+    }
+
+    return $result;
+}
+
+function quote_identifier_orderby($str)
+{
+    $columnName = $str;
+    $direction = "";
+    $parts = array_map("trim", explode(" ", trim($columnName)));
+
+    if (count($parts) == 2) {
+        [$columnName, $direction] = $parts;
+    }
+
+    $columnName = quote_identifier_column($columnName);
+
+    if ($direction) {
+        $columnName .= strtoupper(" {$direction}");
+    }
+
+    return $columnName;
 }
