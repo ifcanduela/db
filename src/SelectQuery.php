@@ -50,7 +50,7 @@ class SelectQuery extends Query
      * @param bool $enable
      * @return self
      */
-    public function distinct(bool $enable = true)
+    public function distinct(bool $enable = true): SelectQuery
     {
         $this->changed = true;
         $this->distinct = $enable;
@@ -61,10 +61,10 @@ class SelectQuery extends Query
     /**
      * Set the columns for the SELECT query.
      *
-     * @param string $column
+     * @param string ...$column
      * @return self
      */
-    public function columns(string ...$column)
+    public function columns(string ...$column): SelectQuery
     {
         $this->changed = true;
         $this->columns = $column;
@@ -75,10 +75,10 @@ class SelectQuery extends Query
     /**
      * Append columns for the SELECT query.
      *
-     * @param string $column [description]
+     * @param string ...$column [description]
      * @return self
      */
-    public function addColumns(...$column)
+    public function addColumns(...$column): SelectQuery
     {
         $this->changed = true;
         $this->columns += $column;
@@ -93,7 +93,7 @@ class SelectQuery extends Query
      * @param array $on
      * @return self
      */
-    public function join(string $table, array $on)
+    public function join(string $table, array $on): SelectQuery
     {
         $this->changed = true;
         $this->joins[] = ["JOIN", $table, $on];
@@ -108,7 +108,7 @@ class SelectQuery extends Query
      * @param array $on
      * @return self
      */
-    public function innerJoin(string $table, array $on)
+    public function innerJoin(string $table, array $on): SelectQuery
     {
         $this->changed = true;
         $this->joins[] = ["INNER JOIN", $table, $on];
@@ -123,7 +123,7 @@ class SelectQuery extends Query
      * @param array $on
      * @return self
      */
-    public function leftJoin(string $table, array $on)
+    public function leftJoin(string $table, array $on): SelectQuery
     {
         $this->changed = true;
         $this->joins[] = ["LEFT JOIN", $table, $on];
@@ -138,7 +138,7 @@ class SelectQuery extends Query
      * @param array $on
      * @return self
      */
-    public function leftOuterJoin(string $table, array $on)
+    public function leftOuterJoin(string $table, array $on): SelectQuery
     {
         $this->changed = true;
         $this->joins[] = ["LEFT OUTER JOIN", $table, $on];
@@ -153,7 +153,7 @@ class SelectQuery extends Query
      * @param array $on
      * @return self
      */
-    public function rightJoin(string $table, array $on)
+    public function rightJoin(string $table, array $on): SelectQuery
     {
         $this->changed = true;
         $this->joins[] = ["RIGHT JOIN", $table, $on];
@@ -168,7 +168,7 @@ class SelectQuery extends Query
      * @param array $on
      * @return self
      */
-    public function outerJoin(string $table, array $on)
+    public function outerJoin(string $table, array $on): SelectQuery
     {
         $this->changed = true;
         $this->joins[] = ["OUTER JOIN", $table, $on];
@@ -183,7 +183,7 @@ class SelectQuery extends Query
      * @param array $on
      * @return self
      */
-    public function fullOuterJoin(string $table, array $on)
+    public function fullOuterJoin(string $table, array $on): SelectQuery
     {
         $this->changed = true;
         $this->joins[] = ["FULL OUTER JOIN", $table, $on];
@@ -194,10 +194,10 @@ class SelectQuery extends Query
     /**
      * Set grouping fields to the query.
      *
-     * @param string $field
+     * @param string ...$field
      * @return self
      */
-    public function groupBy(string ...$field)
+    public function groupBy(string ...$field): SelectQuery
     {
         $this->changed = true;
         $this->groupBy = $field;
@@ -215,7 +215,7 @@ class SelectQuery extends Query
      * @return self
      * @see https://bugs.php.net/bug.php?id=60281
      */
-    public function having(array $conditions)
+    public function having(array $conditions): SelectQuery
     {
         $this->changed = true;
         $this->having = $conditions;
@@ -233,7 +233,7 @@ class SelectQuery extends Query
      * @return self
      * @see https://bugs.php.net/bug.php?id=60281
      */
-    public function andHaving(array $conditions)
+    public function andHaving(array $conditions): SelectQuery
     {
         $this->changed = true;
         $this->having = [
@@ -255,7 +255,7 @@ class SelectQuery extends Query
      * @return self
      * @see https://bugs.php.net/bug.php?id=60281
      */
-    public function orHaving(array $conditions)
+    public function orHaving(array $conditions): SelectQuery
     {
         $this->changed = true;
         $this->having = [
@@ -270,10 +270,10 @@ class SelectQuery extends Query
     /**
      * Setup fields for the ORDER BY clause.
      *
-     * @param string $field
+     * @param string ...$field
      * @return self
      */
-    public function orderBy(string ...$field)
+    public function orderBy(string ...$field): SelectQuery
     {
         $this->changed = true;
         $this->orderBy = $field;
@@ -288,7 +288,7 @@ class SelectQuery extends Query
      * @param int|null $offset
      * @return self
      */
-    public function limit(int $limit, int $offset = null)
+    public function limit(int $limit, int $offset = null): SelectQuery
     {
         $this->changed = true;
         $this->limit = $limit;
@@ -306,7 +306,7 @@ class SelectQuery extends Query
      * @param int $offset
      * @return self
      */
-    public function offset(int $offset)
+    public function offset(int $offset): SelectQuery
     {
         $this->changed = true;
         $this->offset = $offset;
@@ -317,9 +317,9 @@ class SelectQuery extends Query
     /**
      * Build the SELECT query.
      *
-     * @return null
+     * @return void
      */
-    protected function build()
+    protected function build(): void
     {
         if (!$this->from) {
             throw new \RuntimeException("No tables provided for FROM clause");
@@ -398,7 +398,7 @@ class SelectQuery extends Query
      *
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         if ($this->changed) {
             $this->build();

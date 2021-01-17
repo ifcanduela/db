@@ -29,7 +29,7 @@ class Database extends PDO
     /** @var bool */
     private $isWritable = true;
 
-    /** @var Logger */
+    /** @var LoggerInterface */
     private $logger;
 
     /** @var array */
@@ -56,9 +56,9 @@ class Database extends PDO
      * options | optional |             | Additional PDO connection options
      *
      * @param array $config
-     * @return \ifcanduela\db\Database|null
+     * @return Database|null
      */
-    public static function fromArray(array $config)
+    public static function fromArray(array $config): Database
     {
         if (!isset($config["engine"])) {
             throw new \InvalidArgumentException("Missing engine: must be either 'mysql' or 'sqlite'");
@@ -85,7 +85,7 @@ class Database extends PDO
             );
         }
 
-        return null;
+        throw new \InvalidArgumentException("Invalid database configuration: `" . json_encode($config) . "`");
     }
 
     /**
@@ -95,7 +95,7 @@ class Database extends PDO
      * @param  array  $options
      * @return static
      */
-    public static function sqlite(string $file, array $options = [])
+    public static function sqlite(string $file, array $options = []): Database
     {
         $options = array_replace(static::$defaultOptions, $options);
         $instance = new static("sqlite:{$file}", null, null, $options);
@@ -115,7 +115,7 @@ class Database extends PDO
      * @param  array       $options
      * @return static
      */
-    public static function mysql(string $host, string $dbname, string $user = null, string $password = null, array $options = [])
+    public static function mysql(string $host, string $dbname, string $user = null, string $password = null, array $options = []): Database
     {
         $options = array_replace(static::$defaultOptions, $options);
         $instance = new static("mysql:host={$host};dbname=${dbname}", $user, $password, $options);
@@ -129,7 +129,7 @@ class Database extends PDO
      *
      * @return bool
      */
-    public function isWritable()
+    public function isWritable(): bool
     {
         return $this->isWritable;
     }
@@ -139,7 +139,7 @@ class Database extends PDO
      *
      * @return string[]
      */
-    public function getTableNames()
+    public function getTableNames(): array
     {
         if ($this->databaseType === self::DB_MYSQL) {
             $sql = "SHOW TABLES";
@@ -167,7 +167,7 @@ class Database extends PDO
      * @param bool $aliased Use an alias as key in the returned array
      * @return array List of the table fields
      */
-    public function getColumnNames(string $table, bool $withTableName = false, bool $aliased = false)
+    public function getColumnNames(string $table, bool $withTableName = false, bool $aliased = false): array
     {
         $cols = [];
 
@@ -216,7 +216,7 @@ class Database extends PDO
      * @return mixed A comma-separated string with the primary key fields or an
      *               array if $asArray is true
      */
-    public function getPrimaryKeys(string $table, bool $asArray = false)
+    public function getPrimaryKeys(string $table, bool $asArray = false): array
     {
         $pk = [];
 
@@ -256,9 +256,9 @@ class Database extends PDO
      * Find out if the database contains a table.
      *
      * @param string $tableName Table name
-     * @return boolean True if the table exists, false otherwise
+     * @return bool True if the table exists, false otherwise
      */
-    public function tableExists(string $tableName)
+    public function tableExists(string $tableName): bool
     {
         try {
             $sql = "SELECT 1 FROM {$tableName} LIMIT 1";
@@ -276,7 +276,7 @@ class Database extends PDO
      *
      * @param string $tableName Table name
      * @param string $columnName Column name
-     * @return boolean True if the column exists, false otherwise
+     * @return bool True if the column exists, false otherwise
      */
     public function columnExists(string $tableName, string $columnName)
     {
@@ -290,16 +290,16 @@ class Database extends PDO
     }
 
     /**
-     * Execute an SQL statement and return the number of affected rows.
+     * Execute an SQL query and return the number of affected rows.
      *
      * @param string $statement
      * @return int
      * @see https://www.php.net/manual/en/pdo.exec.php
      */
-    public function exec($query)
+    public function exec(string $statement): int
     {
-        $result = parent::exec($query);
-        $this->logQuery($query, [], true, $result);
+        $result = parent::exec($statement);
+        $this->logQuery($statement, [], true, $result);
 
         return $result;
     }
@@ -308,12 +308,14 @@ class Database extends PDO
      * Executes an SQL statement, returning a result set as a PDOStatement object.
      *
      * @param string $statement
-     * @return \PDOStatement
+     * @param int|null $fetchMode
+     * @param mixed ...$fetchModeArgs
+     * @return PDOStatement
      * @see https://www.php.net/manual/en/pdo.query.php
      */
-    public function query(string $statement)
+    public function query(string $statement, ?int $fetchMode = null, mixed ...$fetchModeArgs): PDOStatement
     {
-        $result = parent::query(...func_get_args());
+        $result = parent::query($statement, $fetchMode, ...$fetchModeArgs);
         $this->logQuery($statement, [], true, $result->rowCount());
 
         return $result;
@@ -327,7 +329,7 @@ class Database extends PDO
      *
      * @param string|Query $sql
      * @param array $params
-     * @param boolean $returnStatement
+     * @param bool $returnStatement
      * @param int $fetchMode
      * @return array|int|PDOStatement
      */
@@ -421,7 +423,7 @@ class Database extends PDO
      * @param string $sql
      * @return bool
      */
-    protected function isSelectQuery(string $sql)
+    protected function isSelectQuery(string $sql): bool
     {
         $start = substr(trim($sql), 0, 6);
         $command = strtoupper($start);
@@ -436,7 +438,7 @@ class Database extends PDO
      *
      * @return array
      */
-    public function getQueryHistory()
+    public function getQueryHistory(): array
     {
         return $this->queryHistory;
     }

@@ -14,11 +14,9 @@ class DeleteQueryTest extends PHPUnit\Framework\TestCase
         ], $q->getParams());
     }
 
-    /**
-     * @expectedException RuntimeException
-     */
     public function testTableIsrequired()
     {
+        $this->expectException(\RuntimeException::class);
         $q = Query::delete()->where(['a' => 1]);
         $q->getSql();
     }

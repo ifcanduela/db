@@ -14,7 +14,7 @@ class InsertQuery extends Query
     /**
      * InsertQuery constructor.
      *
-     * @param string|NULL $table
+     * @param string|null $table
      */
     public function __construct(string $table = null)
     {
@@ -29,7 +29,7 @@ class InsertQuery extends Query
      * @param string $table
      * @return self
      */
-    public function into(string $table)
+    public function into(string $table): InsertQuery
     {
         $this->table($table);
 
@@ -40,7 +40,7 @@ class InsertQuery extends Query
      * @param array[] $values,... Rows to insert
      * @return self
      */
-    public function values(array ...$values)
+    public function values(array ...$values): InsertQuery
     {
         $this->values = $values;
 
@@ -49,8 +49,10 @@ class InsertQuery extends Query
 
     /**
      * Build the query,
+     *
+     * @return void
      */
-    public function build()
+    public function build(): void
     {
         if (!$this->table) {
             throw new \RuntimeException("No tables provided for INSERT clause");

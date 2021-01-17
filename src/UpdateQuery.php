@@ -14,6 +14,11 @@ class UpdateQuery extends Query
 
     use ConditionBuilder;
 
+    /**
+     * UpdateQuery constructor.
+     *
+     * @param string|null $table
+     */
     public function __construct(string $table = null)
     {
         if ($table) {
@@ -27,7 +32,7 @@ class UpdateQuery extends Query
      * @param array $values
      * @return self
      */
-    public function set(array $values)
+    public function set(array $values): UpdateQuery
     {
         $this->changed = true;
         $this->set = $values;
@@ -37,8 +42,10 @@ class UpdateQuery extends Query
 
     /**
      * Build the query,
+     *
+     * @return void
      */
-    protected function build()
+    protected function build(): void
     {
         if (!$this->table) {
             throw new \RuntimeException("No tables provided for UPDATE clause");

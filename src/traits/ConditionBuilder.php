@@ -13,7 +13,14 @@ trait ConditionBuilder
     /** @var bool  */
     protected $usePlaceholders = true;
 
-    public function buildConditions(array $conditions, $usePlaceholders = true)
+    /**
+     * Build a condition list for WHERE statements.
+     *
+     * @param array $conditions
+     * @param bool $usePlaceholders
+     * @return string
+     */
+    public function buildConditions(array $conditions, $usePlaceholders = true): string
     {
         $this->usePlaceholders = $usePlaceholders;
         $c = [];
@@ -38,7 +45,15 @@ trait ConditionBuilder
         return "(" . implode(" {$joiner} ", $c) . ")";
     }
 
-    public function buildCondition($key, $value, $usePlaceholders = true)
+    /**
+     * Build a condition for a field.
+     *
+     * @param string $key
+     * @param mixed $value
+     * @param bool $usePlaceholders
+     * @return string
+     */
+    public function buildCondition(string $key, $value, $usePlaceholders = true): string
     {
         $this->usePlaceholders = $usePlaceholders;
         $clause = null;
@@ -95,7 +110,7 @@ trait ConditionBuilder
         return "{$key} = {$placeholder}";
     }
 
-    private function addPlaceholder($value)
+    private function addPlaceholder($value): string
     {
         if (!$this->usePlaceholders) {
             return $value;

@@ -4,10 +4,9 @@ namespace ifcanduela\db;
 
 class CountQuery extends SelectQuery
 {
-    function build()
+    protected function build(): void
     {
         array_unshift($this->columns, "COUNT(*)");
-
-        return parent::build();
+        parent::build();
     }
 }

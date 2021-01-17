@@ -11,7 +11,7 @@ class DeleteQuery extends Query
     /**
      * DeleteQuery constructor.
      *
-     * @param string|NULL $table
+     * @param string|null $table
      */
     public function __construct(string $table = null)
     {
@@ -22,8 +22,10 @@ class DeleteQuery extends Query
 
     /**
      * Build the query,
+     *
+     * @return void
      */
-    public function build()
+    public function build(): void
     {
         if (!$this->table) {
             throw new \RuntimeException("No tables provided for FROM clause");

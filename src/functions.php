@@ -8,7 +8,7 @@ namespace ifcanduela\db;
  * @param array $array
  * @return array
  */
-function array_flatten(array $array)
+function array_flatten(array $array): array
 {
     $it = new \RecursiveIteratorIterator(new \RecursiveArrayIterator($array));
     return iterator_to_array($it, false);
@@ -18,9 +18,9 @@ function array_flatten(array $array)
  * Create a raw SQL expression.
  *
  * @param mixed $expression
- * @return \ifcanduela\db\Expression
+ * @return Expression
  */
-function raw($expression)
+function raw($expression): Expression
 {
     return new Expression($expression);
 }
@@ -32,10 +32,10 @@ function raw($expression)
  *
  * @param string $identifier
  * @param string $startQuote Defaults to double quote (")
- * @param string $endQuote Defaults to double quote (")
+ * @param string|null $endQuote Defaults to double quote (")
  * @return string
  */
-function qi($identifier, $startQuote = "\"", $endQuote = null)
+function qi(string $identifier, string $startQuote = "\"", string $endQuote = null): string
 {
     if ($endQuote === null) {
         $endQuote = $startQuote;
@@ -57,7 +57,13 @@ function qi($identifier, $startQuote = "\"", $endQuote = null)
     return implode(" ", $parts);
 }
 
-function quote_identifier_column(string $str)
+/**
+ * Quote an identifier used as a column name.
+ *
+ * @param string $str
+ * @return string
+ */
+function quote_identifier_column(string $str): string
 {
     if (in_array($str[0], ["(", "`", "*"])) {
         return $str;
@@ -109,7 +115,13 @@ function quote_identifier_column(string $str)
     return $result;
 }
 
-function quote_identifier_orderby($str)
+/**
+ * Quote an identifier for use in an ORDER BY clause.
+ *
+ * @param string $str
+ * @return string
+ */
+function quote_identifier_orderby(string $str): string
 {
     $columnName = $str;
     $direction = "";

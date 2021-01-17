@@ -4,7 +4,7 @@ namespace ifcanduela\db;
 
 abstract class Query
 {
-    /** @var string[] */
+    /** @var string|string[] */
     protected $table;
 
     /** @var string[] */
@@ -60,7 +60,7 @@ abstract class Query
      * @param  string $table Name of the table to update
      * @return UpdateQuery
      */
-    public static function update(string $table = null)
+    public static function update(string $table = null): UpdateQuery
     {
         return new UpdateQuery($table);
     }
@@ -68,7 +68,7 @@ abstract class Query
     /**
      * Create a DELETE query.
      *
-     * @param  string $table Name of the table to delete from
+     * @param string $table Name of the table to delete from
      * @return DeleteQuery
      */
     public static function delete(string $table = null)
@@ -85,7 +85,7 @@ abstract class Query
      * @param  string $table
      * @return self
      */
-    public function table(string $table)
+    public function table(string $table): Query
     {
         $this->changed = true;
         $this->table = $table;
@@ -96,10 +96,10 @@ abstract class Query
     /**
      * Set the list of tables on which a SELECT query operates.
      *
-     * @param  string $table,...
+     * @param  string ...$table
      * @return self
      */
-    public function from(string ...$table)
+    public function from(string ...$table): Query
     {
         $this->changed = true;
         $this->from = $table;
@@ -113,7 +113,7 @@ abstract class Query
      * @param  array  $conditions
      * @return self
      */
-    public function where(array $conditions)
+    public function where(array $conditions): Query
     {
         $this->changed = true;
         $this->conditions = $conditions;
@@ -127,7 +127,7 @@ abstract class Query
      * @param  array  $conditions
      * @return self
      */
-    public function andWhere(array $conditions)
+    public function andWhere(array $conditions): Query
     {
         $this->changed = true;
 
@@ -150,7 +150,7 @@ abstract class Query
      * @param  array  $conditions
      * @return self
      */
-    public function orWhere(array $conditions)
+    public function orWhere(array $conditions): Query
     {
         $this->changed = true;
 
@@ -172,7 +172,7 @@ abstract class Query
      *
      * @return string
      */
-    public function getSql()
+    public function getSql(): string
     {
         if ($this->changed) {
             $this->build();
@@ -186,7 +186,7 @@ abstract class Query
      *
      * @return array
      */
-    public function getParams()
+    public function getParams(): array
     {
         if ($this->changed) {
             $this->build();
@@ -197,6 +197,8 @@ abstract class Query
 
     /**
      * Build the query,
+     *
+     * @return void
      */
-    abstract protected function build();
+    abstract protected function build(): void;
 }

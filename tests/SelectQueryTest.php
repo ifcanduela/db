@@ -7,11 +7,9 @@ use function ifcanduela\db\qi;
 
 class SelectQueryTest extends PHPUnit\Framework\TestCase
 {
-    /**
-     * @expectedException RuntimeException
-     */
     public function testFromIsRequired()
     {
+        $this->expectException(\RuntimeException::class);
         $q = Query::select();
         $q->getSql();
     }
