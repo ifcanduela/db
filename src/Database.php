@@ -21,6 +21,7 @@ use Psr\Log\LoggerInterface;
 class Database extends PDO
 {
     const DB_MYSQL = "mysql";
+
     const DB_SQLITE = "sqlite";
 
     /** @var string */
@@ -37,9 +38,9 @@ class Database extends PDO
 
     /** @var array Default PDO options set by the factory methods */
     private static $defaultOptions = [
-        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::ATTR_EMULATE_PREPARES   => false,
+        PDO::ATTR_EMULATE_PREPARES => false,
     ];
 
     /**
@@ -91,8 +92,8 @@ class Database extends PDO
     /**
      * Factory for a Sqlite connection.
      *
-     * @param  string $file
-     * @param  array  $options
+     * @param string $file
+     * @param array $options
      * @return static
      */
     public static function sqlite(string $file, array $options = []): Database
@@ -108,11 +109,11 @@ class Database extends PDO
     /**
      * Factory for a MySQL connection.
      *
-     * @param  string      $host
-     * @param  string      $dbname
-     * @param  string|null $user
-     * @param  string|null $password
-     * @param  array       $options
+     * @param string $host
+     * @param string $dbname
+     * @param string|null $user
+     * @param string|null $password
+     * @param array $options
      * @return static
      */
     public static function mysql(string $host, string $dbname, string $user = null, string $password = null, array $options = []): Database
@@ -153,8 +154,8 @@ class Database extends PDO
         $r = $this->query($sql)->fetchAll();
 
         $tables = array_map(function ($t) {
-                return reset($t);
-            }, $r);
+            return reset($t);
+        }, $r);
 
         return $tables;
     }
@@ -213,10 +214,10 @@ class Database extends PDO
      *
      * @param string $table Name of the table in the database
      * @param bool $asArray Return multiple keys as an array (default is false)
-     * @return mixed A comma-separated string with the primary key fields or an
-     *               array if $asArray is true
+     * @return string|array A comma-separated string with the primary key fields or an
+     *                      array if $asArray is true
      */
-    public function getPrimaryKeys(string $table, bool $asArray = false): array
+    public function getPrimaryKeys(string $table, bool $asArray = false)
     {
         $pk = [];
 
@@ -244,12 +245,12 @@ class Database extends PDO
             }
         }
 
-        # if the return value is preferred as string
-        if (!$asArray) {
-            $pk = join(",", $pk);
+        # if the return value is preferred as array
+        if ($asArray) {
+            return $pk;
         }
 
-        return $pk;
+        return join(",", $pk);
     }
 
     /**
