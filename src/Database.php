@@ -237,7 +237,7 @@ class Database extends PDO
 
         $r = $this->query($sql)->fetchAll();
 
-        # Search all columns for the Primary Key flag
+        # search all columns for the Primary Key flag
         foreach ($r as $col) {
             if ($col[$primaryKeyIndex] == $primaryKeyValue) {
                 # Add this column to the primary keys list
@@ -279,7 +279,7 @@ class Database extends PDO
      * @param string $columnName Column name
      * @return bool True if the column exists, false otherwise
      */
-    public function columnExists(string $tableName, string $columnName)
+    public function columnExists(string $tableName, string $columnName): bool
     {
         if ($this->tableExists($tableName)) {
             $names = array_flip($this->getColumnNames($tableName));
@@ -297,7 +297,7 @@ class Database extends PDO
      * @return int
      * @see https://www.php.net/manual/en/pdo.exec.php
      */
-    public function exec(string $statement): int
+    public function exec($statement)
     {
         $result = parent::exec($statement);
         $this->logQuery($statement, [], true, $result);
@@ -309,14 +309,14 @@ class Database extends PDO
      * Executes an SQL statement, returning a result set as a PDOStatement object.
      *
      * @param string $statement
-     * @param int|null $fetchMode
+     * @param int|null ...$fetchMode
      * @param mixed ...$fetchModeArgs
-     * @return PDOStatement
+     * @return PDOStatement|false
      * @see https://www.php.net/manual/en/pdo.query.php
      */
-    public function query(string $statement, ?int $fetchMode = null, mixed ...$fetchModeArgs): PDOStatement
+    public function query(string $statement, $fetchMode = null, ...$fetchModeArgs)
     {
-        $result = parent::query($statement, $fetchMode, ...$fetchModeArgs);
+        $result = parent::query($statement, ...$fetchModeArgs);
         $this->logQuery($statement, [], true, $result->rowCount());
 
         return $result;
