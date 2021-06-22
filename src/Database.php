@@ -309,12 +309,12 @@ class Database extends PDO
      * Executes an SQL statement, returning a result set as a PDOStatement object.
      *
      * @param string $statement
-     * @param int|null ...$fetchMode
+     * @param int $fetchMode
      * @param mixed ...$fetchModeArgs
      * @return PDOStatement|false
      * @see https://www.php.net/manual/en/pdo.query.php
      */
-    public function query(string $statement, $fetchMode = null, ...$fetchModeArgs)
+    public function query($statement, $fetchMode = \PDO::FETCH_ASSOC, ...$fetchModeArgs)
     {
         $result = parent::query($statement, ...$fetchModeArgs);
         $this->logQuery($statement, [], true, $result->rowCount());
