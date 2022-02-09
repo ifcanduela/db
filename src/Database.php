@@ -297,6 +297,7 @@ class Database extends PDO
      * @return int
      * @see https://www.php.net/manual/en/pdo.exec.php
      */
+    #[\ReturnTypeWillChange]
     public function exec($statement)
     {
         $result = parent::exec($statement);
@@ -314,6 +315,7 @@ class Database extends PDO
      * @return PDOStatement|false
      * @see https://www.php.net/manual/en/pdo.query.php
      */
+    #[\ReturnTypeWillChange]
     public function query($statement, $fetchMode = \PDO::FETCH_ASSOC, ...$fetchModeArgs)
     {
         $result = parent::query($statement, ...$fetchModeArgs);
