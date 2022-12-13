@@ -1,7 +1,6 @@
 <?php
 
 use ifcanduela\db\Query;
-use ifcanduela\db\Count;
 
 use function ifcanduela\db\qi;
 
@@ -9,7 +8,7 @@ class SelectQueryTest extends PHPUnit\Framework\TestCase
 {
     public function testFromIsRequired()
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $q = Query::select();
         $q->getSql();
     }
@@ -347,7 +346,7 @@ class SelectQueryTest extends PHPUnit\Framework\TestCase
     public function testSubquery()
     {
         $q1 = Query::select()->from('users')->where(['id' => ['>', 1]]);
-        $q2 = Query::select()->from("({$q1})")->where(['age' => 3]);
+        $q2 = Query::select()->from("($q1)")->where(['age' => 3]);
 
         $sql = $q2->getSql();
 
@@ -377,7 +376,6 @@ class SelectQueryTest extends PHPUnit\Framework\TestCase
 
     public function testSelectWhereIsNullWithLimit()
     {
-        /** @var \ifcanduela\db\SelectQuery $q */
         $q = Query::select('users.*')->from('users')->where(['id' => null])->limit(1);
         $sql = $q->getSql();
         $expect = "SELECT users.* FROM users WHERE (id IS NULL) LIMIT :p_1";
@@ -387,7 +385,6 @@ class SelectQueryTest extends PHPUnit\Framework\TestCase
 
     public function testSelectWithComplexArrayCondition()
     {
-        /** @var \ifcanduela\db\SelectQuery $q */
         $q = Query::select()->from('users')->where([
             'AND',
             'a' => 1,
@@ -399,7 +396,6 @@ class SelectQueryTest extends PHPUnit\Framework\TestCase
             ]
         ]);
 
-        /** @var \ifcanduela\db\SelectQuery $q2 */
         $q2 = Query::select()->from('users')
             ->where(['c' => 3])
             ->orWhere(['d' => 4])

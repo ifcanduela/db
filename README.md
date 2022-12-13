@@ -28,7 +28,7 @@ The following options are set by default when using the static factories to crea
 - Results will be returned as associative arrays.
 - Prepared statements will **not** be emulated.
 
-### Create a conection using an array
+### Create a connection using an array
 
 Connections can also be created using an array:
 

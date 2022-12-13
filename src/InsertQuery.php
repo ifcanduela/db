@@ -3,11 +3,12 @@
 namespace ifcanduela\db;
 
 use ifcanduela\db\traits\ConditionBuilder;
+use RuntimeException;
 
 class InsertQuery extends Query
 {
     /** @var array[] */
-    protected $values;
+    protected array $values = [];
 
     use ConditionBuilder;
 
@@ -54,12 +55,12 @@ class InsertQuery extends Query
      */
     public function build(): void
     {
-        if (!$this->table) {
-            throw new \RuntimeException("No tables provided for INSERT clause");
+        if (!isset($this->table)) {
+            throw new RuntimeException("No tables provided for INSERT clause");
         }
 
-        if (!$this->values) {
-            throw new \RuntimeException("No values provided for INSERT clause");
+        if (!count($this->values)) {
+            throw new RuntimeException("No values provided for INSERT clause");
         }
 
         $sql = ["INSERT INTO"];

@@ -12,7 +12,7 @@ class FunctionsTest extends PHPUnit\Framework\TestCase
         $this->assertEquals($expected, quote_identifier_column($columnName));
     }
 
-    public function columnNamesProvider()
+    public function columnNamesProvider(): array
     {
         return [
             ["name", "`name`"],

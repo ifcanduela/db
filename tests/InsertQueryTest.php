@@ -28,16 +28,16 @@ class InsertQueryTest extends PHPUnit\Framework\TestCase
         ], $q->getParams());
     }
 
-    public function testTableIsrequired()
+    public function testTableIsRequired()
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $q = Query::insert()->values(['a' => 1]);
         $q->getSql();
     }
 
-    public function testValuesIsrequired()
+    public function testValuesIsRequired()
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $q = Query::insert()->into('users');
         $q->getSql();
     }

@@ -2,10 +2,12 @@
 
 namespace ifcanduela\db;
 
+use InvalidArgumentException;
 use PDO;
 use PDOException;
 use PDOStatement;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 
 /**
  * Wrapper class for PDO database connections.
@@ -24,20 +26,16 @@ class Database extends PDO
 
     const DB_SQLITE = "sqlite";
 
-    /** @var string */
-    private $databaseType;
+    private string $databaseType;
 
-    /** @var bool */
-    private $isWritable = true;
+    private bool $isWritable = true;
 
-    /** @var LoggerInterface */
-    private $logger;
+    private ?LoggerInterface $logger = null;
 
-    /** @var array */
-    private $queryHistory = [];
+    private array $queryHistory = [];
 
     /** @var array Default PDO options set by the factory methods */
-    private static $defaultOptions = [
+    private static array $defaultOptions = [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         PDO::ATTR_EMULATE_PREPARES => false,
@@ -57,16 +55,16 @@ class Database extends PDO
      * options | optional |             | Additional PDO connection options
      *
      * @param array $config
-     * @return Database|null
+     * @return Database
      */
     public static function fromArray(array $config): Database
     {
         if (!isset($config["engine"])) {
-            throw new \InvalidArgumentException("Missing engine: must be either 'mysql' or 'sqlite'");
+            throw new InvalidArgumentException("Missing engine: must be either 'mysql' or 'sqlite'");
         }
 
         if (!in_array(strtolower($config["engine"]), [self::DB_MYSQL, self::DB_SQLITE])) {
-            throw new \InvalidArgumentException("Unsupported engine `{$config['engine']}`");
+            throw new InvalidArgumentException("Unsupported engine `{$config['engine']}`");
         }
 
         if ($config["engine"] === self::DB_SQLITE) {
@@ -86,7 +84,7 @@ class Database extends PDO
             );
         }
 
-        throw new \InvalidArgumentException("Invalid database configuration: `" . json_encode($config) . "`");
+        throw new InvalidArgumentException("Invalid database configuration: `" . json_encode($config) . "`");
     }
 
     /**
@@ -99,7 +97,7 @@ class Database extends PDO
     public static function sqlite(string $file, array $options = []): Database
     {
         $options = array_replace(static::$defaultOptions, $options);
-        $instance = new static("sqlite:{$file}", null, null, $options);
+        $instance = new static("sqlite:$file", null, null, $options);
         $instance->databaseType = self::DB_SQLITE;
         $instance->isWritable = ($file === ":memory:") || (is_writable(dirname($file)) && is_writable($file));
 
@@ -119,7 +117,7 @@ class Database extends PDO
     public static function mysql(string $host, string $dbname, string $user = null, string $password = null, array $options = []): Database
     {
         $options = array_replace(static::$defaultOptions, $options);
-        $instance = new static("mysql:host={$host};dbname=${dbname}", $user, $password, $options);
+        $instance = new static("mysql:host=$host;dbname=$dbname", $user, $password, $options);
         $instance->databaseType = self::DB_MYSQL;
 
         return $instance;
@@ -147,17 +145,15 @@ class Database extends PDO
         } elseif ($this->databaseType === self::DB_SQLITE) {
             $sql = "SELECT name FROM sqlite_master WHERE type='table'";
         } else {
-            throw new \RuntimeException("Unsupported database type: `{$this->databaseType}`");
+            throw new RuntimeException("Unsupported database type: `$this->databaseType`");
         }
 
-        # Get a list of the tables
+        // Get a list of the tables
         $r = $this->query($sql)->fetchAll();
 
-        $tables = array_map(function ($t) {
+        return array_map(function ($t) {
             return reset($t);
         }, $r);
-
-        return $tables;
     }
 
     /**
@@ -173,28 +169,28 @@ class Database extends PDO
         $cols = [];
 
         if ($this->databaseType === self::DB_MYSQL) {
-            $sql = "SHOW COLUMNS FROM {$table}";
+            $sql = "SHOW COLUMNS FROM $table";
             $tableNameIndex = "Field";
         } elseif ($this->databaseType === self::DB_SQLITE) {
-            $sql = "PRAGMA table_info({$table})";
+            $sql = "PRAGMA table_info($table)";
             $tableNameIndex = "name";
         } else {
-            throw new \RuntimeException("Unsupported database type: `{$this->databaseType}`");
+            throw new RuntimeException("Unsupported database type: `$this->databaseType`");
         }
 
-        # Get all columns from a selected table
+        // Get all columns from a selected table
         $r = $this->query($sql)->fetchAll();
 
-        # Add column names to $cols array
+        // Add column names to $cols array
         foreach ($r as $i => $col) {
             $colName = $col[$tableNameIndex];
 
             if ($aliased) {
-                $i = "{$table}_{$colName}";
+                $i = implode("_", [$table, $colName]);
             }
 
             if ($withTableName) {
-                $colName = "{$table}.${colName}";
+                $colName = implode(".", [$table, $colName]);
             }
 
             $cols[$i] = $colName;
@@ -217,35 +213,35 @@ class Database extends PDO
      * @return string|array A comma-separated string with the primary key fields or an
      *                      array if $asArray is true
      */
-    public function getPrimaryKeys(string $table, bool $asArray = false)
+    public function getPrimaryKeys(string $table, bool $asArray = false): array|string
     {
         $pk = [];
 
         if ($this->databaseType === self::DB_MYSQL) {
-            $sql = "SHOW COLUMNS FROM {$table}";
+            $sql = "SHOW COLUMNS FROM $table";
             $primaryKeyIndex = "Key";
             $primaryKeyValue = "PRI";
             $tableNameIndex = "Field";
         } elseif ($this->databaseType === self::DB_SQLITE) {
-            $sql = "PRAGMA table_info({$table})";
+            $sql = "PRAGMA table_info($table)";
             $primaryKeyIndex = "pk";
             $primaryKeyValue = 1;
             $tableNameIndex = "name";
         } else {
-            throw new \RuntimeException("Unsupported database type: `{$this->databaseType}`");
+            throw new RuntimeException("Unsupported database type: `$this->databaseType`");
         }
 
         $r = $this->query($sql)->fetchAll();
 
-        # search all columns for the Primary Key flag
+        // Search all columns for the Primary Key flag
         foreach ($r as $col) {
             if ($col[$primaryKeyIndex] == $primaryKeyValue) {
-                # Add this column to the primary keys list
+                // Add this column to the primary keys list
                 $pk[] = $col[$tableNameIndex];
             }
         }
 
-        # if the return value is preferred as array
+        // If the return value is preferred as array
         if ($asArray) {
             return $pk;
         }
@@ -262,10 +258,10 @@ class Database extends PDO
     public function tableExists(string $tableName): bool
     {
         try {
-            $sql = "SELECT 1 FROM {$tableName} LIMIT 1";
+            $sql = "SELECT 1 FROM $tableName LIMIT 1";
             $this->prepare($sql);
             $this->logQuery("[PREPARE ONLY] $sql");
-        } catch (PDOException $e) {
+        } catch (PDOException) {
             return false;
         }
 
@@ -294,10 +290,10 @@ class Database extends PDO
      * Execute an SQL query and return the number of affected rows.
      *
      * @param string $statement
-     * @return int
+     * @return false|int
      * @see https://www.php.net/manual/en/pdo.exec.php
      */
-    public function exec($statement)
+    public function exec(string $statement): false|int
     {
         $result = parent::exec($statement);
         $this->logQuery($statement, [], true, $result);
@@ -308,16 +304,16 @@ class Database extends PDO
     /**
      * Executes an SQL statement, returning a result set as a PDOStatement object.
      *
-     * @param string $statement
-     * @param int|null ...$fetchMode
+     * @param string $query
+     * @param int|null $fetchMode
      * @param mixed ...$fetchModeArgs
      * @return PDOStatement|false
      * @see https://www.php.net/manual/en/pdo.query.php
      */
-    public function query(string $statement, $fetchMode = null, ...$fetchModeArgs)
+    public function query(string $query, ?int $fetchMode = null, ...$fetchModeArgs): PDOStatement|false
     {
-        $result = parent::query($statement, ...$fetchModeArgs);
-        $this->logQuery($statement, [], true, $result->rowCount());
+        $result = parent::query($query, $fetchMode, ...$fetchModeArgs);
+        $this->logQuery($query, [], true, $result->rowCount());
 
         return $result;
     }
@@ -328,13 +324,13 @@ class Database extends PDO
      * The return value is an array of rows for SELECT statements and a number of affected rows
      * for any other type of statement.
      *
-     * @param string|Query $sql
+     * @param Query|string $sql
      * @param array $params
      * @param bool $returnStatement
      * @param int $fetchMode
      * @return array|int|PDOStatement
      */
-    public function run($sql, array $params = [], bool $returnStatement = false, int $fetchMode = PDO::FETCH_ASSOC)
+    public function run(Query|string $sql, array $params = [], bool $returnStatement = false, int $fetchMode = PDO::FETCH_ASSOC): int|array|PDOStatement
     {
         if ($sql instanceof Query) {
             $params = $sql->getParams();
@@ -358,14 +354,14 @@ class Database extends PDO
     /**
      * Run a query using a prepared statement and return the first row.
      *
-     * @param string|Query $sql
+     * @param Query|string $sql
      * @param array $params
      * @param int $rowNumber
      * @return array|null
      */
-    public function row($sql, array $params = [], $rowNumber = 0)
+    public function row(Query|string $sql, array $params = [], int $rowNumber = 0): ?array
     {
-        $result = $this->run($sql, $params, false, PDO::FETCH_ASSOC);
+        $result = $this->run($sql, $params);
 
         return $result[$rowNumber] ?? null;
     }
@@ -373,12 +369,12 @@ class Database extends PDO
     /**
      * Run a query using a prepared statement and return the first column of the first row.
      *
-     * @param string|Query $sql
+     * @param Query|string $sql
      * @param array $params
      * @param int|string $columnName
      * @return string|null
      */
-    public function cell($sql, array $params = [], $columnName = 0)
+    public function cell(Query|string $sql, array $params = [], int|string $columnName = 0): ?string
     {
         $result = $this->run($sql, $params, false, PDO::FETCH_BOTH);
 
@@ -401,17 +397,17 @@ class Database extends PDO
      * @param string $sql
      * @param array $params
      * @param bool $success
-     * @param int $affectedRows
+     * @param int|null $affectedRows
      */
-    public function logQuery(string $sql, array $params = [], $success = true, $affectedRows = null)
+    public function logQuery(string $sql, array $params = [], bool $success = true, int $affectedRows = null)
     {
         $this->queryHistory[] = [microtime(true), $sql, $params, $success, $affectedRows];
 
-        if ($this->logger instanceof LoggerInterface) {
+        if (isset($this->logger)) {
             $message = $sql . " => " . json_encode($params);
 
             if (!$success) {
-                $message = "[ERROR] {$message}";
+                $message = "[ERROR] $message";
             }
 
             $this->logger->info($message);

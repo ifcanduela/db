@@ -3,6 +3,7 @@
 namespace ifcanduela\db;
 
 use ifcanduela\db\traits\ConditionBuilder;
+use RuntimeException;
 
 class DeleteQuery extends Query
 {
@@ -27,8 +28,8 @@ class DeleteQuery extends Query
      */
     public function build(): void
     {
-        if (!$this->table) {
-            throw new \RuntimeException("No tables provided for FROM clause");
+        if (!isset($this->table)) {
+            throw new RuntimeException("No tables provided for FROM clause");
         }
 
         $sql = ["DELETE FROM"];

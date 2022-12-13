@@ -1,18 +1,17 @@
 <?php
 
 use ifcanduela\db\Database;
-use ifcanduela\db\Query;
 
 class DatabaseTest extends PHPUnit\Framework\TestCase
 {
-    public $testMysql = false;
+    public bool $testMysql = false;
 
-    public function getDatabase()
+    public function getDatabase(): Database
     {
         return Database::sqlite(':memory:');
     }
 
-    public function getSqliteDatabase()
+    public function getSqliteDatabase(): Database
     {
         $d = $this->getDatabase();
 
@@ -24,7 +23,7 @@ class DatabaseTest extends PHPUnit\Framework\TestCase
         return $d;
     }
 
-    public function getMysqlDatabase()
+    public function getMysqlDatabase(): Database
     {
         return Database::mysql(
             '127.0.0.1',

@@ -16,16 +16,16 @@ class UpdateQueryTest extends PHPUnit\Framework\TestCase
         ], $q->getParams());
     }
 
-    public function testTableIsrequired()
+    public function testTableIsRequired()
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $q = Query::update()->set(['a' => 1]);
         $q->getSql();
     }
 
-    public function testSetIsrequired()
+    public function testSetIsRequired()
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $q = Query::update()->table('users');
         $q->getSql();
     }

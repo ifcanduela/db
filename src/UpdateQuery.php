@@ -3,14 +3,13 @@
 namespace ifcanduela\db;
 
 use ifcanduela\db\traits\ConditionBuilder;
+use RuntimeException;
 
 class UpdateQuery extends Query
 {
-    /** @var string */
-    protected $table;
+    protected string|array $table;
 
-    /** @var array */
-    protected $set;
+    protected array $set = [];
 
     use ConditionBuilder;
 
@@ -47,12 +46,12 @@ class UpdateQuery extends Query
      */
     protected function build(): void
     {
-        if (!$this->table) {
-            throw new \RuntimeException("No tables provided for UPDATE clause");
+        if (!isset($this->table)) {
+            throw new RuntimeException("No tables provided for UPDATE clause");
         }
 
-        if (!$this->set) {
-            throw new \RuntimeException("No columns provided for UPDATE clause");
+        if (!count($this->set)) {
+            throw new RuntimeException("No columns provided for UPDATE clause");
         }
 
         $sql = ["UPDATE"];
@@ -63,7 +62,7 @@ class UpdateQuery extends Query
 
         foreach ($this->set as $field => $value) {
             $placeholder = $this->addPlaceholder($value);
-            $set[] = "{$field} = {$placeholder}";
+            $set[] = "$field = $placeholder";
         }
 
         $sql[] = implode(", ", $set);

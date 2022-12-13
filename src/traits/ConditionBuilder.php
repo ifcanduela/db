@@ -7,11 +7,9 @@ use ifcanduela\db\Expression;
 
 trait ConditionBuilder
 {
-    /** @var int */
-    protected $placeholderCounter = 1;
+    protected int $placeholderCounter = 1;
 
-    /** @var bool  */
-    protected $usePlaceholders = true;
+    protected bool $usePlaceholders = true;
 
     /**
      * Build a condition list for WHERE statements.
@@ -20,7 +18,7 @@ trait ConditionBuilder
      * @param bool $usePlaceholders
      * @return string
      */
-    public function buildConditions(array $conditions, $usePlaceholders = true): string
+    public function buildConditions(array $conditions, bool $usePlaceholders = true): string
     {
         $this->usePlaceholders = $usePlaceholders;
         $c = [];
@@ -42,7 +40,7 @@ trait ConditionBuilder
             $i++;
         }
 
-        return "(" . implode(" {$joiner} ", $c) . ")";
+        return "(" . implode(" $joiner ", $c) . ")";
     }
 
     /**
@@ -53,10 +51,9 @@ trait ConditionBuilder
      * @param bool $usePlaceholders
      * @return string
      */
-    public function buildCondition(string $key, $value, $usePlaceholders = true): string
+    public function buildCondition(string $key, mixed $value, bool $usePlaceholders = true): string
     {
         $this->usePlaceholders = $usePlaceholders;
-        $clause = null;
 
         if (is_array($value)) {
             $operator = strtoupper(array_shift($value));
@@ -73,41 +70,41 @@ trait ConditionBuilder
 
                     $s = implode(", ", $placeholders);
 
-                    $clause = "{$key} {$operator} ({$s})";
+                    $clause = "$key $operator ($s)";
                     break;
                 case "IS":
                 case "NOT IS":
                 case "IS NOT":
-                    $clause = "{$key} {$operator} NULL";
+                    $clause = "$key $operator NULL";
                     break;
                 case "BETWEEN":
                 case "NOT BETWEEN":
                     $from_placeholder = $this->addPlaceholder($value[0]);
                     $to_placeholder = $this->addPlaceholder($value[1]);
 
-                    $clause = "{$key} {$operator} {$from_placeholder} AND {$to_placeholder}";
+                    $clause = "$key $operator $from_placeholder AND $to_placeholder";
                     break;
                 case "LIKE":
                 case "NOT LIKE":
                     $placeholder = $this->addPlaceholder($value[0]);
-                    $clause = "{$key} {$operator} {$placeholder}";
+                    $clause = "$key $operator $placeholder";
                     break;
                 default:
                     $placeholder = $this->addPlaceholder($value[0]);
 
-                    $clause = "{$key} {$operator} {$placeholder}";
+                    $clause = "$key $operator $placeholder";
             }
 
             return $clause;
         }
 
         if (is_null($value)) {
-            return "{$key} IS NULL";
+            return "$key IS NULL";
         }
 
         $placeholder = $this->addPlaceholder($value);
 
-        return "{$key} = {$placeholder}";
+        return "$key = $placeholder";
     }
 
     private function addPlaceholder($value): string

@@ -2,6 +2,9 @@
 
 namespace ifcanduela\db;
 
+use RecursiveArrayIterator;
+use RecursiveIteratorIterator;
+
 /**
  * Create an array containing all non-array members of an array, recursively.
  *
@@ -10,7 +13,7 @@ namespace ifcanduela\db;
  */
 function array_flatten(array $array): array
 {
-    $it = new \RecursiveIteratorIterator(new \RecursiveArrayIterator($array));
+    $it = new RecursiveIteratorIterator(new RecursiveArrayIterator($array));
     return iterator_to_array($it, false);
 }
 
@@ -20,7 +23,7 @@ function array_flatten(array $array): array
  * @param mixed $expression
  * @return Expression
  */
-function raw($expression): Expression
+function raw(mixed $expression): Expression
 {
     return new Expression($expression);
 }
@@ -50,7 +53,7 @@ function qi(string $identifier, string $startQuote = "\"", string $endQuote = nu
         } elseif ($i > 0 && strtoupper($w) == "AS") {
             $parts[] = "AS";
         } else {
-            $parts[] = str_replace(".", "{$endQuote}.{$startQuote}", "{$startQuote}{$w}{$endQuote}");
+            $parts[] = str_replace(".", "$endQuote.$startQuote", "$startQuote$w$endQuote");
         }
     }
 
@@ -70,13 +73,12 @@ function quote_identifier_column(string $str): string
     }
 
     $isFunction = false;
-    $tableName = "";
     $columnName = $str;
     $alias = "";
 
     $columnName = trim($columnName);
 
-    if ($space = mb_strpos($str, " ") > -1) {
+    if (mb_strpos($str, " ") > -1) {
         [$columnName, $alias] = array_map("trim", explode(" ", $columnName, 2));
         $alias = trim($alias);
         $as = strtoupper(mb_substr($alias, 0, 3));
@@ -100,13 +102,13 @@ function quote_identifier_column(string $str): string
     }
 
     $columnName = array_map(function ($columnName) {
-        return $columnName === "*" ? $columnName : "`{$columnName}`";
+        return $columnName === "*" ? $columnName : "`$columnName`";
     }, array_filter($columnName));
 
     $columnName = implode(".", $columnName);
-    $alias = $alias && $alias[0] !== "`"? "`{$alias}`" : $alias;
+    $alias = $alias && $alias[0] !== "`"? "`$alias`" : $alias;
 
-    $result = $isFunction ? "{$isFunction}(${columnName})" : $columnName;
+    $result = $isFunction ? "$isFunction($columnName)" : $columnName;
 
     if ($alias) {
         $result = "$result AS $alias";
@@ -134,7 +136,7 @@ function quote_identifier_orderby(string $str): string
     $columnName = quote_identifier_column($columnName);
 
     if ($direction) {
-        $columnName .= strtoupper(" {$direction}");
+        $columnName .= strtoupper(" $direction");
     }
 
     return $columnName;

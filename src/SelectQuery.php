@@ -3,39 +3,35 @@
 namespace ifcanduela\db;
 
 use ifcanduela\db\traits\ConditionBuilder;
+use RuntimeException;
 
 class SelectQuery extends Query
 {
-    /** @var bool */
-    protected $distinct = false;
+    protected bool $distinct = false;
 
     /** @var string[] */
-    protected $columns = ["*"];
+    protected array $columns = ["*"];
 
-    /** @var array */
-    protected $joins = [];
-
-    /** @var string[] */
-    protected $groupBy;
-
-    /** @var array */
-    protected $having;
+    protected array $joins = [];
 
     /** @var string[] */
-    protected $orderBy;
+    protected array $groupBy = [];
 
-    /** @var int */
-    protected $limit;
+    protected array $having = [];
 
-    /** @var int */
-    protected $offset;
+    /** @var string[] */
+    protected array $orderBy = [];
+
+    protected ?int $limit;
+
+    protected ?int $offset;
 
     use ConditionBuilder;
 
     /**
      * Create a SELECT query builder.
      *
-     * @param string $columns
+     * @param string ...$columns
      */
     public function __construct(string ...$columns)
     {
@@ -87,7 +83,7 @@ class SelectQuery extends Query
     }
 
     /**
-     * Setup a JOIN table.
+     * Add a JOIN table.
      *
      * @param string $table
      * @param array $on
@@ -102,7 +98,7 @@ class SelectQuery extends Query
     }
 
     /**
-     * Setup a INNER JOIN table.
+     * Add an INNER JOIN table.
      *
      * @param string $table
      * @param array $on
@@ -117,7 +113,7 @@ class SelectQuery extends Query
     }
 
     /**
-     * Setup a LEFT JOIN table.
+     * Add a LEFT JOIN table.
      *
      * @param string $table
      * @param array $on
@@ -132,7 +128,7 @@ class SelectQuery extends Query
     }
 
     /**
-     * Setup a LEFT OUTER JOIN table.
+     * Add a LEFT OUTER JOIN table.
      *
      * @param string $table
      * @param array $on
@@ -147,7 +143,7 @@ class SelectQuery extends Query
     }
 
     /**
-     * Setup a RIGHT JOIN table.
+     * Add a RIGHT JOIN table.
      *
      * @param string $table
      * @param array $on
@@ -162,7 +158,7 @@ class SelectQuery extends Query
     }
 
     /**
-     * Setup a OUTER JOIN table.
+     * Add an OUTER JOIN table.
      *
      * @param string $table
      * @param array $on
@@ -177,7 +173,7 @@ class SelectQuery extends Query
     }
 
     /**
-     * Setup a FULL OUTER JOIN table.
+     * Add an FULL OUTER JOIN table.
      *
      * @param string $table
      * @param array $on
@@ -321,8 +317,8 @@ class SelectQuery extends Query
      */
     protected function build(): void
     {
-        if (!$this->from) {
-            throw new \RuntimeException("No tables provided for FROM clause");
+        if (!isset($this->from)) {
+            throw new RuntimeException("No tables provided for FROM clause");
         }
 
         $this->placeholders = [];
@@ -339,7 +335,7 @@ class SelectQuery extends Query
         $sql[] = "FROM";
         $sql[] = implode(", ", $this->from);
 
-        if ($this->joins) {
+        if (count($this->joins)) {
             foreach ($this->joins as $join) {
                 $sql[] = $join[0];
                 $sql[] = $join[1];
@@ -350,39 +346,39 @@ class SelectQuery extends Query
             }
         }
 
-        if ($this->conditions) {
+        if (count($this->conditions)) {
             $sql[] = "WHERE";
             $sql[] = $this->buildConditions($this->conditions);
         }
 
-        if ($this->groupBy) {
+        if (count($this->groupBy)) {
             $sql[] = "GROUP BY";
             $sql[] = implode(", ", $this->groupBy);
         }
 
-        if ($this->having) {
+        if (count($this->having)) {
             $sql[] = "HAVING";
             $sql[] = $this->buildConditions($this->having);
         }
 
-        if ($this->orderBy) {
+        if (count($this->orderBy)) {
             $sql[] = "ORDER BY";
             $sql[] = implode(", ", $this->orderBy);
         }
 
-        if ($this->limit || $this->offset) {
+        if (isset($this->limit) || isset($this->offset)) {
             $sql[] = "LIMIT";
 
             $parts = [];
 
-            if ($this->offset) {
-                if (!$this->limit) {
+            if (isset($this->offset)) {
+                if (!isset($this->limit)) {
                     $this->limit = PHP_INT_MAX;
                 }
                 $parts[] = $this->addPlaceholder($this->offset);
             }
 
-            if ($this->limit) {
+            if (isset($this->limit)) {
                 $parts[] = $this->addPlaceholder($this->limit);
             }
 

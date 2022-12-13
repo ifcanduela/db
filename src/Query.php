@@ -5,30 +5,30 @@ namespace ifcanduela\db;
 abstract class Query
 {
     /** @var string|string[] */
-    protected $table;
+    protected string|array $table;
 
     /** @var string[] */
-    protected $from;
+    protected array $from;
 
     /** @var array */
-    protected $conditions;
+    protected array $conditions = [];
 
     /** @var bool */
-    protected $changed = true;
+    protected bool $changed = true;
 
     /** @var string */
-    protected $sql;
+    protected string $sql;
 
     /** @var array */
-    protected $placeholders = [];
+    protected array $placeholders = [];
 
     /**
      * Create a SELECT query.
      *
-     * @param string $field,... List of fields to select
+     * @param string ...$field
      * @return SelectQuery
      */
-    public static function select(string ...$field)
+    public static function select(string ...$field): SelectQuery
     {
         return new SelectQuery(...$field);
     }
@@ -38,7 +38,7 @@ abstract class Query
      *
      * @return CountQuery
      */
-    public static function count()
+    public static function count(): CountQuery
     {
         return new CountQuery();
     }
@@ -46,10 +46,10 @@ abstract class Query
     /**
      * Create an INSERT query.
      *
-     * @param string $table Name of the table to insert into
+     * @param string|null $table Name of the table to insert into
      * @return InsertQuery
      */
-    public static function insert(string $table = null)
+    public static function insert(string $table = null): InsertQuery
     {
         return new InsertQuery($table);
     }
@@ -57,7 +57,7 @@ abstract class Query
     /**
      * Create an UPDATE query.
      *
-     * @param  string $table Name of the table to update
+     * @param string|null $table Name of the table to update
      * @return UpdateQuery
      */
     public static function update(string $table = null): UpdateQuery
@@ -68,10 +68,10 @@ abstract class Query
     /**
      * Create a DELETE query.
      *
-     * @param string $table Name of the table to delete from
+     * @param string|null $table Name of the table to delete from
      * @return DeleteQuery
      */
-    public static function delete(string $table = null)
+    public static function delete(string $table = null): DeleteQuery
     {
         return new DeleteQuery($table);
     }
